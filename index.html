@@ -240,6 +240,11 @@
         font-weight: 700;
       }
 
+      .duration-text {
+        font-size: 0.72rem;
+        font-style: italic;
+      }
+
       .legend-block {
         border: 1px dashed rgba(17, 19, 27, 0.2);
         border-radius: 18px;
@@ -805,15 +810,17 @@
 
       function applyBreakRule(entries) {
         if (!entries || entries.length === 0) {
-          return { netMinutes: 0, hasBreak: false };
+          return { netMinutes: 0, hasBreak: false, breakEntry: null };
         }
         const entryWindows = entries
+          .filter(isTimedEntry)
           .map((entry) => {
             const window = getEntryWindowMinutes(entry);
             if (!window) {
               return null;
             }
             return {
+              entry,
               start: window.start,
               end: window.end,
               duration: window.end - window.start,
@@ -838,10 +845,21 @@
           return entry.start - previous.end >= 30;
         });
 
-        if (needsBreak && !hasLongGap) {
-          return { netMinutes: Math.max(0, totalMinutes - 30), hasBreak: true };
+        if (needsBreak && !hasLongGap && entryWindows.length > 0) {
+          const breakCandidate =
+            entryWindows.find((entry) => entry.duration > 6 * 60) ||
+            entryWindows[entryWindows.length - 1];
+          return {
+            netMinutes: Math.max(0, totalMinutes - 30),
+            hasBreak: true,
+            breakEntry: breakCandidate.entry,
+          };
         }
-        return { netMinutes: totalMinutes, hasBreak: false };
+        return {
+          netMinutes: totalMinutes,
+          hasBreak: false,
+          breakEntry: null,
+        };
       }
 
       function calculateDayTotals(entries) {
@@ -851,6 +869,7 @@
             hasBreak: false,
             shiftMinutes: 0,
             hasCountableEntry: false,
+            breakEntry: null,
           };
         }
         const absenceMinutes = entries
@@ -861,9 +880,9 @@
             0
           );
         const shiftEntries = entries.filter((entry) => !isAbsenceEntry(entry));
+        const { netMinutes: shiftMinutes, hasBreak, breakEntry } =
+          applyBreakRule(shiftEntries);
         const timedShiftEntries = shiftEntries.filter(isTimedEntry);
-        const { netMinutes: shiftMinutes, hasBreak } =
-          applyBreakRule(timedShiftEntries);
         const hasCountableEntry =
           timedShiftEntries.length > 0 || absenceMinutes > 0;
         return {
@@ -871,6 +890,7 @@
           hasBreak,
           shiftMinutes,
           hasCountableEntry,
+          breakEntry,
         };
       }
 
@@ -1115,8 +1135,13 @@
               placeholder.textContent = "—";
               cell.appendChild(placeholder);
             } else {
-              const { netMinutes, hasBreak, shiftMinutes, hasCountableEntry } =
-                calculateDayTotals(entries);
+              const {
+                netMinutes,
+                hasBreak,
+                shiftMinutes,
+                hasCountableEntry,
+                breakEntry,
+              } = calculateDayTotals(entries);
               if (!hasCountableEntry) {
                 memberEligible = false;
               }
@@ -1136,7 +1161,7 @@
                   line.appendChild(label);
 
                   const duration = document.createElement("span");
-                  duration.className = "text-muted small";
+                  duration.className = "text-muted duration-text";
                   duration.textContent = `(${formatHours(absenceMinutes)})`;
                   line.appendChild(duration);
                 } else {
@@ -1152,12 +1177,15 @@
                       entry.endTime
                     );
                     const duration = document.createElement("span");
-                    duration.className = "text-muted small";
+                    duration.className = "text-muted duration-text";
                     const isSingleShiftEntry =
                       entries.length === 1 && !isAbsenceEntry(entries[0]);
-                    const displayMinutes = isSingleShiftEntry
+                    let displayMinutes = isSingleShiftEntry
                       ? shiftMinutes
                       : entryMinutes;
+                    if (!isSingleShiftEntry && hasBreak && breakEntry === entry) {
+                      displayMinutes = Math.max(0, entryMinutes - 30);
+                    }
                     duration.textContent = `(${formatHours(displayMinutes)})`;
                     line.appendChild(duration);
                   }
@@ -1497,7 +1525,8 @@
             if (!entry || entry.length === 0) {
               return;
             }
-            const { netMinutes } = calculateDayTotals(entry);
+            const { netMinutes, hasBreak, breakEntry } =
+              calculateDayTotals(entry);
             entry.forEach((segment) => {
               if (isAbsenceEntry(segment)) {
                 const absenceMinutes =
@@ -1519,6 +1548,11 @@
                 segment.startTime,
                 segment.endTime
               );
+              let exportMinutes =
+                entry.length === 1 ? netMinutes : minutes;
+              if (hasBreak && breakEntry === segment && entry.length > 1) {
+                exportMinutes = Math.max(0, minutes - 30);
+              }
               rows.push([
                 segment.type || "Dienst",
                 member,
@@ -1528,9 +1562,7 @@
                 segment.location || "",
                 "",
                 hasTimes
-                  ? formatHoursDecimal(
-                      entry.length === 1 ? netMinutes : minutes
-                    )
+                  ? formatHoursDecimal(exportMinutes)
                   : "",
               ]);
             });
