@@ -992,9 +992,7 @@
         eventsRow.appendChild(eventsTotalCell);
         scheduleBody.appendChild(eventsRow);
 
-        const members = Object.keys(schedule).sort((a, b) =>
-          a.localeCompare(b)
-        );
+        const members = Object.keys(schedule);
 
         members.forEach((member) => {
           const row = document.createElement("tr");
@@ -1343,53 +1341,51 @@
           });
         });
 
-        Object.keys(schedule)
-          .sort((a, b) => a.localeCompare(b))
-          .forEach((member) => {
-            weekDays.forEach((day) => {
-              const entry = schedule[member][day];
-              if (!entry || entry.length === 0) {
-                return;
-              }
-              const { netMinutes } = calculateDayTotals(entry);
-              entry.forEach((segment) => {
-                if (isAbsenceEntry(segment)) {
-                  const absenceMinutes =
-                    segment.absenceMinutes || DEFAULT_FULL_DAY_MINUTES;
-                  rows.push([
-                    segment.type,
-                    member,
-                    day,
-                    "",
-                    "",
-                    "",
-                    "",
-                    formatHoursDecimal(absenceMinutes),
-                  ]);
-                  return;
-                }
-                const hasTimes = segment.startTime && segment.endTime;
-                const minutes = calculateDurationMinutes(
-                  segment.startTime,
-                  segment.endTime
-                );
+        Object.keys(schedule).forEach((member) => {
+          weekDays.forEach((day) => {
+            const entry = schedule[member][day];
+            if (!entry || entry.length === 0) {
+              return;
+            }
+            const { netMinutes } = calculateDayTotals(entry);
+            entry.forEach((segment) => {
+              if (isAbsenceEntry(segment)) {
+                const absenceMinutes =
+                  segment.absenceMinutes || DEFAULT_FULL_DAY_MINUTES;
                 rows.push([
-                  segment.type || "Dienst",
+                  segment.type,
                   member,
                   day,
-                  segment.startTime,
-                  segment.endTime,
-                  segment.location || "",
                   "",
-                  hasTimes
-                    ? formatHoursDecimal(
-                        entry.length === 1 ? netMinutes : minutes
-                      )
-                    : "",
+                  "",
+                  "",
+                  "",
+                  formatHoursDecimal(absenceMinutes),
                 ]);
-              });
+                return;
+              }
+              const hasTimes = segment.startTime && segment.endTime;
+              const minutes = calculateDurationMinutes(
+                segment.startTime,
+                segment.endTime
+              );
+              rows.push([
+                segment.type || "Dienst",
+                member,
+                day,
+                segment.startTime,
+                segment.endTime,
+                segment.location || "",
+                "",
+                hasTimes
+                  ? formatHoursDecimal(
+                      entry.length === 1 ? netMinutes : minutes
+                    )
+                  : "",
+              ]);
             });
           });
+        });
 
         const csvContent = rows
           .map((row) =>
