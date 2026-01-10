@@ -152,9 +152,16 @@
       }
 
       .schedule-table td {
-        padding: 16px;
+        padding: 12px 10px;
         border-color: rgba(17, 19, 27, 0.08);
         font-weight: 500;
+      }
+
+      .schedule-table th:first-child,
+      .schedule-table th:last-child,
+      .schedule-table td:first-child,
+      .schedule-table td:last-child {
+        vertical-align: middle;
       }
 
       .shift-chip {
@@ -313,6 +320,11 @@
       }
 
       @media print {
+        @page {
+          size: A4 landscape;
+          margin: 10mm;
+        }
+
         body {
           background: #ffffff;
           color: #0f172a;
@@ -339,21 +351,24 @@
           border: 1px solid rgba(17, 19, 27, 0.12);
           background: #ffffff;
           border-radius: 16px;
+          width: 100%;
         }
 
         .schedule-table {
-          font-size: 12px;
+          font-size: 10px;
+          width: 100%;
+          table-layout: fixed;
         }
 
         .schedule-table th {
           background: var(--night) !important;
           color: #f8f1e5 !important;
           border: none !important;
-          padding: 12px !important;
+          padding: 8px 6px !important;
         }
 
         .schedule-table td {
-          padding: 10px 12px !important;
+          padding: 6px 6px !important;
           border-color: rgba(17, 19, 27, 0.12) !important;
           vertical-align: top;
         }
@@ -393,7 +408,7 @@
       </div>
     </header>
 
-    <main class="container pb-5">
+    <main class="container-fluid pb-5 px-4">
       <div class="row g-4 mb-4">
         <div class="col-lg-5">
           <div class="panel h-100">
@@ -548,61 +563,39 @@
           </div>
         </div>
         <div class="col-lg-7">
-          <div class="panel h-100">
-            <h2 class="h4 fw-semibold mb-3">Hinweise zur Erfassung</h2>
-            <div class="text-muted">
-              <p>
-                Wähle zuerst den Tag und das Teammitglied. Danach Eintragstyp
-                auswählen: Dienst, Urlaub oder Krank. Urlaub/Krank zählt als
-                voller Arbeitstag mit konfigurierbarer Tagesarbeitszeit.
-              </p>
-              <p>
-                Bei Dienst kannst du Zeiten angeben; wenn keine Zeit gesetzt
-                wird, erscheint kein Tages- oder Wochen‑Summe für diese Person.
-                Für Ereignisse nutze den Toggle „Ereignis hinzufügen“ und gib
-                optional eine Start- und Endzeit an.
-              </p>
-              <p class="mb-0">
-                Klicke eine Zelle, um Einträge zu bearbeiten. Zwischen mehreren
-                Schichten mit mehr als 30 Minuten Abstand wird keine zusätzliche
-                Pause abgezogen.
-              </p>
+          <div class="table-card h-100">
+            <div class="table-responsive">
+              <table class="table schedule-table" id="scheduleTable">
+                <thead>
+                  <tr>
+                    <th>Mitarbeiter</th>
+                    <th data-day="Montag">
+                      <span class="day-label">Montag</span>
+                      <span class="day-date d-none"></span>
+                    </th>
+                    <th data-day="Dienstag">
+                      <span class="day-label">Dienstag</span>
+                      <span class="day-date d-none"></span>
+                    </th>
+                    <th data-day="Mittwoch">
+                      <span class="day-label">Mittwoch</span>
+                      <span class="day-date d-none"></span>
+                    </th>
+                    <th data-day="Donnerstag">
+                      <span class="day-label">Donnerstag</span>
+                      <span class="day-date d-none"></span>
+                    </th>
+                    <th data-day="Freitag">
+                      <span class="day-label">Freitag</span>
+                      <span class="day-date d-none"></span>
+                    </th>
+                    <th>Summe (Std.)</th>
+                  </tr>
+                </thead>
+                <tbody id="scheduleBody"></tbody>
+              </table>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div class="table-card">
-        <div class="table-responsive">
-          <table class="table schedule-table" id="scheduleTable">
-            <thead>
-              <tr>
-                <th>Mitarbeiter</th>
-                <th data-day="Montag">
-                  <span class="day-label">Montag</span>
-                  <span class="day-date d-none"></span>
-                </th>
-                <th data-day="Dienstag">
-                  <span class="day-label">Dienstag</span>
-                  <span class="day-date d-none"></span>
-                </th>
-                <th data-day="Mittwoch">
-                  <span class="day-label">Mittwoch</span>
-                  <span class="day-date d-none"></span>
-                </th>
-                <th data-day="Donnerstag">
-                  <span class="day-label">Donnerstag</span>
-                  <span class="day-date d-none"></span>
-                </th>
-                <th data-day="Freitag">
-                  <span class="day-label">Freitag</span>
-                  <span class="day-date d-none"></span>
-                </th>
-                <th>Summe (Std.)</th>
-              </tr>
-            </thead>
-            <tbody id="scheduleBody"></tbody>
-          </table>
         </div>
       </div>
     </main>
