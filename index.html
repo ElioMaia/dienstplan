@@ -741,8 +741,13 @@
       }
 
       function formatHours(minutes) {
-        const hours = (minutes / 60).toFixed(1);
-        return `${hours.replace(".", ",")} h`;
+        const totalMinutes = Math.round(minutes);
+        const hours = Math.floor(totalMinutes / 60);
+        const remainingMinutes = totalMinutes % 60;
+        if (remainingMinutes === 0) {
+          return `${hours} h`;
+        }
+        return `${hours} h ${remainingMinutes} min`;
       }
 
       function formatHoursDecimal(minutes) {
