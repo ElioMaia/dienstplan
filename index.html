@@ -598,6 +598,14 @@
                   Zeiten hinzufügen
                 </button>
                 <button
+                  class="btn btn-outline-danger"
+                  type="button"
+                  id="deleteBtn"
+                  disabled
+                >
+                  Eintrag löschen
+                </button>
+                <button
                   class="btn btn-outline-dark"
                   type="button"
                   id="clearBtn"
@@ -692,6 +700,7 @@
       const allDayEventToggle = document.getElementById("allDayEvent");
       const eventTitleInput = document.getElementById("eventTitle");
       const clearBtn = document.getElementById("clearBtn");
+      const deleteBtn = document.getElementById("deleteBtn");
       const pdfBtn = document.getElementById("pdfBtn");
       const csvExportBtn = document.getElementById("csvExportBtn");
       const csvImportBtn = document.getElementById("csvImportBtn");
@@ -1253,6 +1262,16 @@
         entryEditState.index = null;
       }
 
+      function updateDeleteButtonState() {
+        const hasEntrySelection =
+          entryEditState.member !== null &&
+          entryEditState.day !== null &&
+          entryEditState.index !== null;
+        const hasEventSelection =
+          eventEditState.day !== null && eventEditState.index !== null;
+        deleteBtn.disabled = !(hasEntrySelection || hasEventSelection);
+      }
+
       function updateEntryTypeMode() {
         const isEvent = allDayEventToggle.checked;
         const isAbsence = absenceTypes.has(entryTypeSelect.value);
@@ -1290,6 +1309,7 @@
           memberInput.setAttribute("required", "required");
         }
         updateEntryTypeMode();
+        updateDeleteButtonState();
       }
 
       scheduleForm.addEventListener("submit", (event) => {
@@ -1364,6 +1384,7 @@
         toggleEventMode(false);
         resetEventEditState();
         resetEntryEditState();
+        updateDeleteButtonState();
         renderTable();
       });
 
@@ -1376,7 +1397,50 @@
         });
         resetEntryEditState();
         resetEventEditState();
+        updateDeleteButtonState();
         renderTable();
+      });
+
+      deleteBtn.addEventListener("click", () => {
+        const isEvent = allDayEventToggle.checked;
+        let didDelete = false;
+        if (
+          isEvent &&
+          eventEditState.day !== null &&
+          eventEditState.index !== null
+        ) {
+          const events = allDayEvents[eventEditState.day];
+          if (events && events[eventEditState.index]) {
+            events.splice(eventEditState.index, 1);
+            didDelete = true;
+          }
+          resetEventEditState();
+        } else if (
+          entryEditState.member !== null &&
+          entryEditState.day !== null &&
+          entryEditState.index !== null
+        ) {
+          const entries =
+            schedule[entryEditState.member] &&
+            schedule[entryEditState.member][entryEditState.day];
+          if (entries && entries[entryEditState.index]) {
+            entries.splice(entryEditState.index, 1);
+            if (entries.length === 0) {
+              delete schedule[entryEditState.member][entryEditState.day];
+            }
+            didDelete = true;
+          }
+          resetEntryEditState();
+        }
+
+        if (didDelete) {
+          scheduleForm.reset();
+          entryTypeSelect.value = "Dienst";
+          absenceHoursInput.value = "8,00";
+          toggleEventMode(false);
+          renderTable();
+        }
+        updateDeleteButtonState();
       });
 
       pdfBtn.addEventListener("click", () => {
@@ -1666,15 +1730,16 @@
               eventEditState.index = Number.isNaN(index) ? null : index;
             }
           } else {
-            eventTitleInput.value = "";
-            startTimeInput.value = "";
-            endTimeInput.value = "";
-            resetEventEditState();
-          }
-          weekdaySelect.value = day;
-          eventTitleInput.focus();
-          return;
+          eventTitleInput.value = "";
+          startTimeInput.value = "";
+          endTimeInput.value = "";
+          resetEventEditState();
         }
+        weekdaySelect.value = day;
+        eventTitleInput.focus();
+        updateDeleteButtonState();
+        return;
+      }
 
         const member = row.getAttribute("data-member");
         const day = cell.getAttribute("data-day");
@@ -1713,6 +1778,7 @@
           resetEntryEditState();
           updateEntryTypeMode();
         }
+        updateDeleteButtonState();
         if (absenceTypes.has(entryTypeSelect.value)) {
           entryTypeSelect.focus();
         } else {
@@ -1735,6 +1801,7 @@
           startTimeInput.value = "";
           endTimeInput.value = "";
         }
+        updateDeleteButtonState();
       });
 
       entryTypeSelect.addEventListener("change", () => {
