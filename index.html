@@ -1149,7 +1149,7 @@
 
               entries.forEach((entry, index) => {
                 const line = document.createElement("div");
-                line.className = "d-flex align-items-center gap-2 flex-wrap";
+                line.className = "d-flex align-items-center flex-wrap";
                 line.setAttribute("data-entry-index", String(index));
 
                 if (isAbsenceEntry(entry)) {
@@ -1191,8 +1191,8 @@
                   }
 
                   if (entry.location) {
-                    const note = document.createElement("span");
-                    note.className = "text-muted small";
+                    const note = document.createElement("div");
+                    note.className = "text-muted small w-100";
                     note.textContent = entry.location;
                     line.appendChild(note);
                   }
