@@ -740,15 +740,15 @@
           0
         );
 
-        const needsBreak = entryWindows.some(
-          (entry) => entry.duration > 6 * 60
-        );
+        const needsBreak =
+          entryWindows.some((entry) => entry.duration > 6 * 60) ||
+          totalMinutes > 6 * 60;
         const hasLongGap = entryWindows.some((entry, index) => {
           if (index === 0) {
             return false;
           }
           const previous = entryWindows[index - 1];
-          return entry.start - previous.end > 30;
+          return entry.start - previous.end >= 30;
         });
 
         if (needsBreak && !hasLongGap) {
@@ -763,7 +763,7 @@
             netMinutes: 0,
             hasBreak: false,
             shiftMinutes: 0,
-            hasIncompleteShift: false,
+            hasCountableEntry: false,
           };
         }
         const absenceMinutes = entries
@@ -774,17 +774,16 @@
             0
           );
         const shiftEntries = entries.filter((entry) => !isAbsenceEntry(entry));
-        const hasIncompleteShift = shiftEntries.some(
-          (entry) => !isTimedEntry(entry)
-        );
-        const { netMinutes: shiftMinutes, hasBreak } = applyBreakRule(
-          shiftEntries.filter(isTimedEntry)
-        );
+        const timedShiftEntries = shiftEntries.filter(isTimedEntry);
+        const { netMinutes: shiftMinutes, hasBreak } =
+          applyBreakRule(timedShiftEntries);
+        const hasCountableEntry =
+          timedShiftEntries.length > 0 || absenceMinutes > 0;
         return {
           netMinutes: shiftMinutes + absenceMinutes,
           hasBreak,
           shiftMinutes,
-          hasIncompleteShift,
+          hasCountableEntry,
         };
       }
 
@@ -930,20 +929,23 @@
         let totalMinutes = 0;
 
         members.forEach((member) => {
-          let memberHasIncomplete = false;
+          let memberMinutes = 0;
+          let memberEligible = true;
           weekDays.forEach((day) => {
             const entries = schedule[member][day];
             if (!entries || entries.length === 0) {
+              memberEligible = false;
               return;
             }
             const dayTotals = calculateDayTotals(entries);
-            if (dayTotals.hasIncompleteShift) {
-              memberHasIncomplete = true;
+            if (!dayTotals.hasCountableEntry) {
+              memberEligible = false;
             }
-            if (!memberHasIncomplete) {
-              totalMinutes += dayTotals.netMinutes;
-            }
+            memberMinutes += dayTotals.netMinutes;
           });
+          if (memberEligible) {
+            totalMinutes += memberMinutes;
+          }
         });
 
         memberCount.textContent = members.length;
@@ -1003,7 +1005,7 @@
           row.appendChild(nameCell);
 
           let memberMinutes = 0;
-          let memberHasIncomplete = false;
+          let memberEligible = true;
 
           weekDays.forEach((day) => {
             const cell = document.createElement("td");
@@ -1011,19 +1013,18 @@
             const entries = schedule[member][day];
 
             if (!entries || entries.length === 0) {
+              memberEligible = false;
               const placeholder = document.createElement("div");
               placeholder.className = "text-muted";
               placeholder.textContent = "—";
               cell.appendChild(placeholder);
             } else {
-              const { netMinutes, hasBreak, shiftMinutes, hasIncompleteShift } =
+              const { netMinutes, hasBreak, shiftMinutes, hasCountableEntry } =
                 calculateDayTotals(entries);
-              if (hasIncompleteShift) {
-                memberHasIncomplete = true;
+              if (!hasCountableEntry) {
+                memberEligible = false;
               }
-              if (!memberHasIncomplete) {
-                memberMinutes += netMinutes;
-              }
+              memberMinutes += netMinutes;
 
               entries.forEach((entry, index) => {
                 const line = document.createElement("div");
@@ -1043,31 +1044,27 @@
                   duration.textContent = `(${formatHours(absenceMinutes)})`;
                   line.appendChild(duration);
                 } else {
-                  const timeRange = document.createElement("span");
-                  timeRange.className = "fw-semibold";
-                  timeRange.textContent =
-                    entry.startTime && entry.endTime
-                      ? `${entry.startTime}–${entry.endTime}`
-                      : ""; //"Ohne Zeit"
-                  line.appendChild(timeRange);
+                  const hasTimes = entry.startTime && entry.endTime;
+                  if (hasTimes) {
+                    const timeRange = document.createElement("span");
+                    timeRange.className = "fw-semibold";
+                    timeRange.textContent = `${entry.startTime}–${entry.endTime}`;
+                    line.appendChild(timeRange);
 
-                  const duration = document.createElement("span");
-                  duration.className = "text-muted small";
-                  if (entry.startTime && entry.endTime) {
                     const entryMinutes = calculateDurationMinutes(
                       entry.startTime,
                       entry.endTime
                     );
+                    const duration = document.createElement("span");
+                    duration.className = "text-muted small";
                     const isSingleShiftEntry =
                       entries.length === 1 && !isAbsenceEntry(entries[0]);
                     const displayMinutes = isSingleShiftEntry
                       ? shiftMinutes
                       : entryMinutes;
                     duration.textContent = `(${formatHours(displayMinutes)})`;
-                  } else {
-                    duration.textContent = ""; //Uhrzeit Platzhalter
+                    line.appendChild(duration);
                   }
-                  line.appendChild(duration);
 
                   if (entry.location) {
                     const note = document.createElement("span");
@@ -1080,14 +1077,7 @@
                 cell.appendChild(line);
               });
 
-              if (entries.length > 1 && !hasIncompleteShift) {
-                const totalLine = document.createElement("div");
-                totalLine.className = "text-muted small";
-                totalLine.textContent = `Summe: ${formatHours(netMinutes)}`;
-                cell.appendChild(totalLine);
-              }
-
-              if (hasBreak && !hasIncompleteShift) {
+              if (hasBreak) {
                 const breakNote = document.createElement("div");
                 breakNote.className = "text-muted small";
                 breakNote.textContent = "Pause";
@@ -1101,9 +1091,7 @@
           const totalCell = document.createElement("td");
           totalCell.className = "fw-semibold";
           totalCell.textContent =
-            memberHasIncomplete || memberMinutes <= 0
-              ? "—"
-              : formatHours(memberMinutes);
+            memberEligible && memberMinutes > 0 ? formatHours(memberMinutes) : "—";
           row.appendChild(totalCell);
 
           scheduleBody.appendChild(row);
