@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dienstplaner - Wöchentlicher Dienstplan</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #11131b;
+        --muted: #5b6475;
+        --paper: #f6f2ea;
+        --sand: #ede5d6;
+        --ocean: #0a4f6e;
+        --sun: #f4a340;
+        --moss: #4f7c58;
+        --rose: #e36c5b;
+        --night: #151a2e;
+      }
+
+      body {
+        font-family: "Space Grotesk", sans-serif;
+        color: var(--ink);
+        background: radial-gradient(
+          circle at 15% 15%,
+          #ffffff 0%,
+          #f8f1e5 38%,
+          #efe2cf 100%
+        );
+        min-height: 100vh;
+      }
+
+      .hero {
+        padding: 48px 0 24px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+            circle at 80% 0%,
+            rgba(10, 79, 110, 0.25) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 0% 100%,
+            rgba(227, 108, 91, 0.2) 0%,
+            transparent 55%
+          );
+        z-index: 0;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 1;
+      }
+
+      .badge-pill {
+        background: var(--night);
+        color: #f8f1e5;
+        letter-spacing: 0.08em;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .badge-pill span {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--sun);
+      }
+
+      .panel {
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 24px;
+        box-shadow: 0 24px 55px rgba(14, 18, 41, 0.12);
+        padding: 28px;
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(17, 19, 27, 0.08);
+      }
+
+      .form-label {
+        font-weight: 600;
+        color: var(--ink);
+      }
+
+      .form-section {
+        background: rgba(255, 255, 255, 0.75);
+        border-radius: 18px;
+        border: 1px solid rgba(17, 19, 27, 0.08);
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+
+      .form-section-title {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      .table-card {
+        border-radius: 28px;
+        overflow: hidden;
+        border: 1px solid rgba(17, 19, 27, 0.08);
+        background: #fffdf8;
+        box-shadow: 0 20px 45px rgba(13, 20, 32, 0.15);
+      }
+
+      .schedule-table {
+        margin: 0;
+        font-family: "IBM Plex Mono", monospace;
+      }
+
+      .schedule-table th {
+        background: var(--night);
+        color: #f8f1e5;
+        padding: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.75rem;
+        border: none;
+      }
+
+      .schedule-table th .day-label {
+        display: block;
+      }
+
+      .schedule-table th .day-date {
+        display: block;
+        text-transform: none;
+        letter-spacing: 0.04em;
+        font-size: 0.65rem;
+        color: rgba(248, 241, 229, 0.7);
+      }
+
+      .schedule-table td {
+        padding: 16px;
+        border-color: rgba(17, 19, 27, 0.08);
+        font-weight: 500;
+      }
+
+      .shift-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #0f172a;
+        background: rgba(15, 23, 42, 0.08);
+      }
+
+      .shift-morning {
+        background: rgba(244, 163, 64, 0.25);
+        color: #7a3e00;
+      }
+
+      .shift-afternoon {
+        background: rgba(79, 124, 88, 0.2);
+        color: #1f4a2a;
+      }
+
+      .shift-night {
+        background: rgba(10, 79, 110, 0.2);
+        color: #0a3a52;
+      }
+
+      .shift-off {
+        background: rgba(227, 108, 91, 0.2);
+        color: #7b2e20;
+      }
+
+      .avatar-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--sun);
+      }
+
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .summary-card {
+        background: linear-gradient(
+          135deg,
+          rgba(21, 26, 46, 0.9),
+          rgba(10, 79, 110, 0.85)
+        );
+        color: #f8f1e5;
+        border-radius: 20px;
+        padding: 20px;
+        min-height: 140px;
+      }
+
+      .summary-card h3 {
+        font-size: 1.1rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .summary-metric {
+        font-size: 2rem;
+        font-weight: 700;
+      }
+
+      .btn-primary {
+        background: var(--night);
+        border-color: var(--night);
+        box-shadow: 0 10px 18px rgba(21, 26, 46, 0.25);
+      }
+
+      .btn-primary:hover {
+        background: #0e1224;
+        border-color: #0e1224;
+      }
+
+      .btn-outline-dark {
+        border-radius: 999px;
+      }
+
+      .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .action-buttons .btn {
+        flex: 1 1 160px;
+      }
+
+      .action-buttons .btn-primary {
+        flex-basis: 220px;
+      }
+
+      .fade-in {
+        animation: fadeIn 0.8s ease forwards;
+      }
+
+      .stagger {
+        opacity: 0;
+        transform: translateY(16px);
+        animation: rise 0.7s ease forwards;
+      }
+
+      .stagger:nth-child(1) {
+        animation-delay: 0.1s;
+      }
+      .stagger:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .stagger:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes rise {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .hero {
+          padding: 32px 0 16px;
+        }
+
+        .panel {
+          padding: 20px;
+        }
+
+        .summary-card {
+          min-height: unset;
+        }
+      }
+
+      @media print {
+        body {
+          background: #ffffff;
+          color: #0f172a;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        .hero,
+        .panel,
+        .summary-card,
+        .legend,
+        form,
+        #pdfBtn,
+        #clearBtn {
+          display: none !important;
+        }
+
+        main {
+          padding-bottom: 0 !important;
+        }
+
+        .table-card {
+          box-shadow: 0 0 0 1px rgba(17, 19, 27, 0.12);
+          border: 1px solid rgba(17, 19, 27, 0.12);
+          background: #ffffff;
+          border-radius: 16px;
+        }
+
+        .schedule-table {
+          font-size: 12px;
+        }
+
+        .schedule-table th {
+          background: var(--night) !important;
+          color: #f8f1e5 !important;
+          border: none !important;
+          padding: 12px !important;
+        }
+
+        .schedule-table td {
+          padding: 10px 12px !important;
+          border-color: rgba(17, 19, 27, 0.12) !important;
+          vertical-align: top;
+        }
+
+        .schedule-table tbody tr:nth-child(even) td {
+          background: #f7f3ec;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="container hero-content">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-7">
+            <div class="badge-pill mb-3"><span></span>Dienstplan Studio</div>
+            <h1 class="display-4 fw-bold">Dienstpläne</h1>
+            <p class="lead text-muted">
+              Plane ausgewogene Rotationen, sieh die Abdeckung sofort und halte
+              dein Team auf einen Blick synchron.
+            </p>
+          </div>
+          <div class="col-lg-5">
+            <div class="summary-card fade-in">
+              <h3 class="mb-3">Wochenüberblick</h3>
+              <div class="d-flex justify-content-between mb-2">
+                <span>Teammitglieder</span>
+                <span class="summary-metric" id="memberCount">6</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span>Stunden gesamt</span>
+                <span class="summary-metric" id="shiftCount">0,0 h</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container pb-5">
+      <div class="row g-4 mb-4">
+        <div class="col-lg-5">
+          <div class="panel h-100">
+            <h2 class="h4 fw-semibold mb-3">Zum Dienstplan hinzufügen</h2>
+            <form id="scheduleForm">
+              <div class="form-section">
+                <div class="form-section-title mb-2">Dienst</div>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label" for="memberName"
+                      >Teammitglied</label
+                    >
+                    <input
+                      class="form-control"
+                      id="memberName"
+                      placeholder="Vor-/Nachname"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="weekday">Tag</label>
+                    <select class="form-select" id="weekday" required>
+                      <option value="">Tag auswählen</option>
+                      <option>Montag</option>
+                      <option>Dienstag</option>
+                      <option>Mittwoch</option>
+                      <option>Donnerstag</option>
+                      <option>Freitag</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="entryType"
+                      >Eintragstyp</label
+                    >
+                    <select class="form-select" id="entryType">
+                      <option value="Dienst">Dienst</option>
+                      <option value="Urlaub">Urlaub</option>
+                      <option value="Krank">Krank</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="absenceHours">
+                      Tagesarbeitszeit (Std.)
+                    </label>
+                    <input
+                      class="form-control"
+                      id="absenceHours"
+                      type="text"
+                      inputmode="decimal"
+                      pattern="^[0-9]+(?:[.,][0-9]{1,2})?$"
+                      value="8,00"
+                      disabled
+                    />
+                    <div class="form-text">
+                      Nur bei Urlaub/Krank erforderlich.
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="weekSelect"
+                      >Kalenderwoche</label
+                    >
+                    <input class="form-control" id="weekSelect" type="week" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="startTime">Startzeit</label>
+                    <input class="form-control" id="startTime" type="time" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="endTime">Endzeit</label>
+                    <input class="form-control" id="endTime" type="time" />
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label" for="location"
+                      >Rolle / Notizen</label
+                    >
+                    <input
+                      class="form-control"
+                      id="location"
+                      placeholder="z. B. Schlafraum"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="form-section">
+                <div
+                  class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2"
+                >
+                  <div class="form-section-title">Ereignis</div>
+                  <div class="form-check m-0">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="allDayEvent"
+                    />
+                    <label class="form-check-label" for="allDayEvent">
+                      Ereignis hinzufügen
+                    </label>
+                  </div>
+                </div>
+                <div class="row g-3">
+                  <div class="col-12">
+                    <label class="form-label" for="eventTitle">Ereignis</label>
+                    <input
+                      class="form-control"
+                      id="eventTitle"
+                      placeholder="z. B. Teamtag"
+                      disabled
+                    />
+                    <div class="form-text">
+                      Optional: Start- und Endzeit setzen, wenn das Ereignis
+                      einen festen Slot hat.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="action-buttons">
+                <button class="btn btn-primary flex-grow-1" type="submit">
+                  Zeiten hinzufügen
+                </button>
+                <button
+                  class="btn btn-outline-dark"
+                  type="button"
+                  id="clearBtn"
+                >
+                  Woche leeren
+                </button>
+                <button class="btn btn-outline-dark" type="button" id="pdfBtn">
+                  PDF exportieren
+                </button>
+                <button
+                  class="btn btn-outline-dark"
+                  type="button"
+                  id="csvExportBtn"
+                >
+                  CSV exportieren
+                </button>
+                <button
+                  class="btn btn-outline-dark"
+                  type="button"
+                  id="csvImportBtn"
+                >
+                  CSV importieren
+                </button>
+                <input
+                  class="d-none"
+                  id="csvFileInput"
+                  type="file"
+                  accept=".csv,text/csv"
+                />
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="col-lg-7">
+          <div class="panel h-100">
+            <h2 class="h4 fw-semibold mb-3">Hinweise zur Erfassung</h2>
+            <div class="text-muted">
+              <p>
+                Wähle zuerst den Tag und das Teammitglied. Danach Eintragstyp
+                auswählen: Dienst, Urlaub oder Krank. Urlaub/Krank zählt als
+                voller Arbeitstag mit konfigurierbarer Tagesarbeitszeit.
+              </p>
+              <p>
+                Bei Dienst kannst du Zeiten angeben; wenn keine Zeit gesetzt
+                wird, erscheint kein Tages- oder Wochen‑Summe für diese Person.
+                Für Ereignisse nutze den Toggle „Ereignis hinzufügen“ und gib
+                optional eine Start- und Endzeit an.
+              </p>
+              <p class="mb-0">
+                Klicke eine Zelle, um Einträge zu bearbeiten. Zwischen mehreren
+                Schichten mit mehr als 30 Minuten Abstand wird keine zusätzliche
+                Pause abgezogen.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="table schedule-table" id="scheduleTable">
+            <thead>
+              <tr>
+                <th>Mitarbeiter</th>
+                <th data-day="Montag">
+                  <span class="day-label">Montag</span>
+                  <span class="day-date d-none"></span>
+                </th>
+                <th data-day="Dienstag">
+                  <span class="day-label">Dienstag</span>
+                  <span class="day-date d-none"></span>
+                </th>
+                <th data-day="Mittwoch">
+                  <span class="day-label">Mittwoch</span>
+                  <span class="day-date d-none"></span>
+                </th>
+                <th data-day="Donnerstag">
+                  <span class="day-label">Donnerstag</span>
+                  <span class="day-date d-none"></span>
+                </th>
+                <th data-day="Freitag">
+                  <span class="day-label">Freitag</span>
+                  <span class="day-date d-none"></span>
+                </th>
+                <th>Summe (Std.)</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const scheduleForm = document.getElementById("scheduleForm");
+      const memberInput = document.getElementById("memberName");
+      const weekdaySelect = document.getElementById("weekday");
+      const weekInput = document.getElementById("weekSelect");
+      const startTimeInput = document.getElementById("startTime");
+      const endTimeInput = document.getElementById("endTime");
+      const locationInput = document.getElementById("location");
+      const entryTypeSelect = document.getElementById("entryType");
+      const absenceHoursInput = document.getElementById("absenceHours");
+      const allDayEventToggle = document.getElementById("allDayEvent");
+      const eventTitleInput = document.getElementById("eventTitle");
+      const clearBtn = document.getElementById("clearBtn");
+      const pdfBtn = document.getElementById("pdfBtn");
+      const csvExportBtn = document.getElementById("csvExportBtn");
+      const csvImportBtn = document.getElementById("csvImportBtn");
+      const csvFileInput = document.getElementById("csvFileInput");
+      const memberCount = document.getElementById("memberCount");
+      const shiftCount = document.getElementById("shiftCount");
+      const scheduleBody = document.getElementById("scheduleBody");
+      const weekdayHeaders = Array.from(
+        document.querySelectorAll("th[data-day]")
+      );
+
+      const weekDays = [
+        "Montag",
+        "Dienstag",
+        "Mittwoch",
+        "Donnerstag",
+        "Freitag",
+      ];
+
+      const schedule = {};
+      const allDayEvents = weekDays.reduce((acc, day) => {
+        acc[day] = [];
+        return acc;
+      }, {});
+      const eventEditState = { day: null, index: null };
+      const entryEditState = { member: null, day: null, index: null };
+
+      function parseTimeToMinutes(value) {
+        if (!value) {
+          return null;
+        }
+        const [hours, minutes] = value.split(":").map(Number);
+        return hours * 60 + minutes;
+      }
+
+      function calculateDurationMinutes(startValue, endValue) {
+        const start = parseTimeToMinutes(startValue);
+        const end = parseTimeToMinutes(endValue);
+        if (start === null || end === null) {
+          return 0;
+        }
+        if (end >= start) {
+          return end - start;
+        }
+        return 24 * 60 - start + end;
+      }
+
+      function formatHours(minutes) {
+        const hours = (minutes / 60).toFixed(1);
+        return `${hours.replace(".", ",")} h`;
+      }
+
+      function formatHoursDecimal(minutes) {
+        return (minutes / 60).toFixed(2);
+      }
+
+      function formatHoursDecimalInput(minutes) {
+        return formatHoursDecimal(minutes).replace(".", ",");
+      }
+
+      const DEFAULT_FULL_DAY_MINUTES = 8 * 60;
+      const absenceTypes = new Set(["Urlaub", "Krank"]);
+
+      function isAbsenceEntry(entry) {
+        return entry && absenceTypes.has(entry.type);
+      }
+
+      function isTimedEntry(entry) {
+        return Boolean(entry && entry.startTime && entry.endTime);
+      }
+
+      function parseHoursToMinutes(value) {
+        if (value === null || value === undefined) {
+          return null;
+        }
+        const normalized = String(value).trim().replace(",", ".");
+        if (!normalized) {
+          return null;
+        }
+        const hours = Number(normalized);
+        if (!Number.isFinite(hours) || hours <= 0) {
+          return null;
+        }
+        return Math.round(hours * 60);
+      }
+
+      function getEntryWindowMinutes(entry) {
+        const start = parseTimeToMinutes(entry.startTime);
+        const end = parseTimeToMinutes(entry.endTime);
+        if (start === null || end === null) {
+          return null;
+        }
+        const normalizedEnd = end >= start ? end : end + 24 * 60;
+        return { start, end: normalizedEnd };
+      }
+
+      function applyBreakRule(entries) {
+        if (!entries || entries.length === 0) {
+          return { netMinutes: 0, hasBreak: false };
+        }
+        const entryWindows = entries
+          .map((entry) => {
+            const window = getEntryWindowMinutes(entry);
+            if (!window) {
+              return null;
+            }
+            return {
+              start: window.start,
+              end: window.end,
+              duration: window.end - window.start,
+            };
+          })
+          .filter(Boolean)
+          .sort((a, b) => a.start - b.start);
+
+        const totalMinutes = entryWindows.reduce(
+          (sum, entry) => sum + entry.duration,
+          0
+        );
+
+        const needsBreak = entryWindows.some(
+          (entry) => entry.duration > 6 * 60
+        );
+        const hasLongGap = entryWindows.some((entry, index) => {
+          if (index === 0) {
+            return false;
+          }
+          const previous = entryWindows[index - 1];
+          return entry.start - previous.end > 30;
+        });
+
+        if (needsBreak && !hasLongGap) {
+          return { netMinutes: Math.max(0, totalMinutes - 30), hasBreak: true };
+        }
+        return { netMinutes: totalMinutes, hasBreak: false };
+      }
+
+      function calculateDayTotals(entries) {
+        if (!entries || entries.length === 0) {
+          return {
+            netMinutes: 0,
+            hasBreak: false,
+            shiftMinutes: 0,
+            hasIncompleteShift: false,
+          };
+        }
+        const absenceMinutes = entries
+          .filter(isAbsenceEntry)
+          .reduce(
+            (sum, entry) =>
+              sum + (entry.absenceMinutes || DEFAULT_FULL_DAY_MINUTES),
+            0
+          );
+        const shiftEntries = entries.filter((entry) => !isAbsenceEntry(entry));
+        const hasIncompleteShift = shiftEntries.some(
+          (entry) => !isTimedEntry(entry)
+        );
+        const { netMinutes: shiftMinutes, hasBreak } = applyBreakRule(
+          shiftEntries.filter(isTimedEntry)
+        );
+        return {
+          netMinutes: shiftMinutes + absenceMinutes,
+          hasBreak,
+          shiftMinutes,
+          hasIncompleteShift,
+        };
+      }
+
+      function parseWeekValue(value) {
+        if (!value) {
+          return null;
+        }
+        const parts = value.split("-W");
+        if (parts.length !== 2) {
+          return null;
+        }
+        const year = Number(parts[0]);
+        const week = Number(parts[1]);
+        if (!Number.isInteger(year) || !Number.isInteger(week)) {
+          return null;
+        }
+        return { year, week };
+      }
+
+      function getIsoWeekStartDate(year, week) {
+        const jan4 = new Date(year, 0, 4);
+        const jan4Day = jan4.getDay() || 7;
+        const mondayWeek1 = new Date(jan4);
+        mondayWeek1.setDate(jan4.getDate() - jan4Day + 1);
+        const mondayTarget = new Date(mondayWeek1);
+        mondayTarget.setDate(mondayWeek1.getDate() + (week - 1) * 7);
+        return mondayTarget;
+      }
+
+      function formatDate(date) {
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
+      }
+
+      function updateWeekdayHeaders(weekValue) {
+        const parsed = parseWeekValue(weekValue);
+        const headerMap = new Map(
+          weekdayHeaders.map((header) => [
+            header.getAttribute("data-day"),
+            header,
+          ])
+        );
+        if (!parsed) {
+          weekDays.forEach((day) => {
+            const header = headerMap.get(day);
+            if (!header) {
+              return;
+            }
+            const dateSpan = header.querySelector(".day-date");
+            if (dateSpan) {
+              dateSpan.textContent = "";
+              dateSpan.classList.add("d-none");
+            }
+          });
+          return;
+        }
+
+        const monday = getIsoWeekStartDate(parsed.year, parsed.week);
+        weekDays.forEach((day, index) => {
+          const header = headerMap.get(day);
+          if (!header) {
+            return;
+          }
+          const current = new Date(monday);
+          current.setDate(monday.getDate() + index);
+          const dateSpan = header.querySelector(".day-date");
+          if (dateSpan) {
+            dateSpan.textContent = formatDate(current);
+            dateSpan.classList.remove("d-none");
+          }
+        });
+      }
+
+      function escapeCsvValue(value, delimiter) {
+        if (value === null || value === undefined) {
+          return "";
+        }
+        const stringValue = String(value);
+        if (
+          stringValue.includes('"') ||
+          stringValue.includes("\n") ||
+          stringValue.includes("\r") ||
+          stringValue.includes(delimiter)
+        ) {
+          return `"${stringValue.replace(/"/g, '""')}"`;
+        }
+        return stringValue;
+      }
+
+      function parseCsvLine(line, delimiter) {
+        const values = [];
+        let current = "";
+        let inQuotes = false;
+
+        for (let i = 0; i < line.length; i += 1) {
+          const char = line[i];
+          const nextChar = line[i + 1];
+
+          if (char === '"' && inQuotes && nextChar === '"') {
+            current += '"';
+            i += 1;
+            continue;
+          }
+
+          if (char === '"') {
+            inQuotes = !inQuotes;
+            continue;
+          }
+
+          if (char === delimiter && !inQuotes) {
+            values.push(current);
+            current = "";
+            continue;
+          }
+
+          current += char;
+        }
+
+        values.push(current);
+        return values.map((value) => value.trim());
+      }
+
+      function parseCsvText(text) {
+        const lines = text
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter((line) => line.length > 0);
+
+        if (!lines.length) {
+          return [];
+        }
+
+        const delimiter = lines[0].includes(";") ? ";" : ",";
+        const rows = lines.map((line) => parseCsvLine(line, delimiter));
+
+        return { delimiter, rows };
+      }
+
+      function updateMetrics() {
+        const members = Object.keys(schedule);
+        let totalMinutes = 0;
+
+        members.forEach((member) => {
+          let memberHasIncomplete = false;
+          weekDays.forEach((day) => {
+            const entries = schedule[member][day];
+            if (!entries || entries.length === 0) {
+              return;
+            }
+            const dayTotals = calculateDayTotals(entries);
+            if (dayTotals.hasIncompleteShift) {
+              memberHasIncomplete = true;
+            }
+            if (!memberHasIncomplete) {
+              totalMinutes += dayTotals.netMinutes;
+            }
+          });
+        });
+
+        memberCount.textContent = members.length;
+        shiftCount.textContent = formatHours(totalMinutes);
+      }
+
+      function renderTable() {
+        scheduleBody.innerHTML = "";
+        const eventsRow = document.createElement("tr");
+        eventsRow.setAttribute("data-row-type", "events");
+
+        const eventsLabelCell = document.createElement("td");
+        eventsLabelCell.innerHTML = "<strong>Ereignisse</strong>";
+        eventsRow.appendChild(eventsLabelCell);
+
+        weekDays.forEach((day) => {
+          const cell = document.createElement("td");
+          cell.setAttribute("data-day", day);
+          cell.className = "text-muted";
+          const events = allDayEvents[day];
+          if (!events || events.length === 0) {
+            cell.textContent = "—";
+          } else {
+            cell.textContent = "";
+            events.forEach((eventData, index) => {
+              const item = document.createElement("div");
+              item.className = "small text-muted";
+              const timeLabel =
+                eventData.startTime && eventData.endTime
+                  ? `${eventData.startTime}–${eventData.endTime}`
+                  : ""; //Ganztätig Kommentar
+              if (timeLabel == "") {
+                item.textContent = `${eventData.title}`;
+              } else {
+                item.textContent = `${timeLabel} · ${eventData.title}`;
+              }
+              item.setAttribute("data-event-index", String(index));
+              cell.appendChild(item);
+            });
+          }
+          eventsRow.appendChild(cell);
+        });
+
+        const eventsTotalCell = document.createElement("td");
+        eventsTotalCell.textContent = "—";
+        eventsRow.appendChild(eventsTotalCell);
+        scheduleBody.appendChild(eventsRow);
+
+        const members = Object.keys(schedule).sort((a, b) =>
+          a.localeCompare(b)
+        );
+
+        members.forEach((member) => {
+          const row = document.createElement("tr");
+          row.setAttribute("data-member", member);
+
+          const nameCell = document.createElement("td");
+          nameCell.innerHTML = `<strong>${member}</strong>`;
+          row.appendChild(nameCell);
+
+          let memberMinutes = 0;
+          let memberHasIncomplete = false;
+
+          weekDays.forEach((day) => {
+            const cell = document.createElement("td");
+            cell.setAttribute("data-day", day);
+            const entries = schedule[member][day];
+
+            if (!entries || entries.length === 0) {
+              const placeholder = document.createElement("div");
+              placeholder.className = "text-muted";
+              placeholder.textContent = "—";
+              cell.appendChild(placeholder);
+            } else {
+              const { netMinutes, hasBreak, shiftMinutes, hasIncompleteShift } =
+                calculateDayTotals(entries);
+              if (hasIncompleteShift) {
+                memberHasIncomplete = true;
+              }
+              if (!memberHasIncomplete) {
+                memberMinutes += netMinutes;
+              }
+
+              entries.forEach((entry, index) => {
+                const line = document.createElement("div");
+                line.className = "d-flex align-items-center gap-2 flex-wrap";
+                line.setAttribute("data-entry-index", String(index));
+
+                if (isAbsenceEntry(entry)) {
+                  const absenceMinutes =
+                    entry.absenceMinutes || DEFAULT_FULL_DAY_MINUTES;
+                  const label = document.createElement("span");
+                  label.className = "fw-semibold";
+                  label.textContent = entry.type;
+                  line.appendChild(label);
+
+                  const duration = document.createElement("span");
+                  duration.className = "text-muted small";
+                  duration.textContent = `(${formatHours(absenceMinutes)})`;
+                  line.appendChild(duration);
+                } else {
+                  const timeRange = document.createElement("span");
+                  timeRange.className = "fw-semibold";
+                  timeRange.textContent =
+                    entry.startTime && entry.endTime
+                      ? `${entry.startTime}–${entry.endTime}`
+                      : ""; //"Ohne Zeit"
+                  line.appendChild(timeRange);
+
+                  const duration = document.createElement("span");
+                  duration.className = "text-muted small";
+                  if (entry.startTime && entry.endTime) {
+                    const entryMinutes = calculateDurationMinutes(
+                      entry.startTime,
+                      entry.endTime
+                    );
+                    const isSingleShiftEntry =
+                      entries.length === 1 && !isAbsenceEntry(entries[0]);
+                    const displayMinutes = isSingleShiftEntry
+                      ? shiftMinutes
+                      : entryMinutes;
+                    duration.textContent = `(${formatHours(displayMinutes)})`;
+                  } else {
+                    duration.textContent = ""; //Uhrzeit Platzhalter
+                  }
+                  line.appendChild(duration);
+
+                  if (entry.location) {
+                    const note = document.createElement("span");
+                    note.className = "text-muted small";
+                    note.textContent = entry.location;
+                    line.appendChild(note);
+                  }
+                }
+
+                cell.appendChild(line);
+              });
+
+              if (entries.length > 1 && !hasIncompleteShift) {
+                const totalLine = document.createElement("div");
+                totalLine.className = "text-muted small";
+                totalLine.textContent = `Summe: ${formatHours(netMinutes)}`;
+                cell.appendChild(totalLine);
+              }
+
+              if (hasBreak && !hasIncompleteShift) {
+                const breakNote = document.createElement("div");
+                breakNote.className = "text-muted small";
+                breakNote.textContent = "Pause";
+                cell.appendChild(breakNote);
+              }
+            }
+
+            row.appendChild(cell);
+          });
+
+          const totalCell = document.createElement("td");
+          totalCell.className = "fw-semibold";
+          totalCell.textContent =
+            memberHasIncomplete || memberMinutes <= 0
+              ? "—"
+              : formatHours(memberMinutes);
+          row.appendChild(totalCell);
+
+          scheduleBody.appendChild(row);
+        });
+
+        updateMetrics();
+      }
+
+      function addEntry({
+        member,
+        day,
+        startTime,
+        endTime,
+        location,
+        entryType,
+        absenceMinutes,
+      }) {
+        if (!schedule[member]) {
+          schedule[member] = {};
+        }
+
+        if (!schedule[member][day]) {
+          schedule[member][day] = [];
+        }
+        const entryData = {
+          startTime,
+          endTime,
+          location,
+          type: entryType || "Dienst",
+          absenceMinutes,
+        };
+        const entries = schedule[member][day];
+        if (
+          entryEditState.member === member &&
+          entryEditState.day === day &&
+          entryEditState.index !== null
+        ) {
+          entries[entryEditState.index] = entryData;
+        } else {
+          entries.push(entryData);
+        }
+
+        if (isAbsenceEntry(entryData)) {
+          schedule[member][day] = [entryData];
+        } else {
+          schedule[member][day] = entries.filter(
+            (entry) => !isAbsenceEntry(entry)
+          );
+        }
+      }
+
+      function addAllDayEvent({ day, title, startTime, endTime }) {
+        if (!allDayEvents[day]) {
+          allDayEvents[day] = [];
+        }
+        const eventData = { title, startTime, endTime };
+        if (eventEditState.day === day && eventEditState.index !== null) {
+          allDayEvents[day][eventEditState.index] = eventData;
+        } else {
+          allDayEvents[day].push(eventData);
+        }
+      }
+
+      function resetEventEditState() {
+        eventEditState.day = null;
+        eventEditState.index = null;
+      }
+
+      function resetEntryEditState() {
+        entryEditState.member = null;
+        entryEditState.day = null;
+        entryEditState.index = null;
+      }
+
+      function updateEntryTypeMode() {
+        const isEvent = allDayEventToggle.checked;
+        const isAbsence = absenceTypes.has(entryTypeSelect.value);
+        if (isEvent) {
+          entryTypeSelect.disabled = true;
+          locationInput.disabled = true;
+          startTimeInput.disabled = false;
+          endTimeInput.disabled = false;
+          absenceHoursInput.disabled = true;
+          absenceHoursInput.removeAttribute("required");
+          return;
+        }
+        entryTypeSelect.disabled = false;
+        locationInput.disabled = isAbsence;
+        startTimeInput.disabled = isAbsence;
+        endTimeInput.disabled = isAbsence;
+        absenceHoursInput.disabled = !isAbsence;
+        if (isAbsence) {
+          absenceHoursInput.setAttribute("required", "required");
+        } else {
+          absenceHoursInput.removeAttribute("required");
+        }
+      }
+
+      function toggleEventMode(isEvent) {
+        memberInput.disabled = isEvent;
+        eventTitleInput.disabled = !isEvent;
+        if (isEvent) {
+          eventTitleInput.setAttribute("required", "required");
+          memberInput.removeAttribute("required");
+          startTimeInput.removeAttribute("required");
+          endTimeInput.removeAttribute("required");
+        } else {
+          eventTitleInput.removeAttribute("required");
+          memberInput.setAttribute("required", "required");
+        }
+        updateEntryTypeMode();
+      }
+
+      scheduleForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const weekValue = weekInput.value;
+        const member = memberInput.value.trim();
+        const day = weekdaySelect.value;
+        const startTime = startTimeInput.value;
+        const endTime = endTimeInput.value;
+        const location = locationInput.value.trim();
+        const entryType = entryTypeSelect.value;
+        const absenceMinutes = parseHoursToMinutes(absenceHoursInput.value);
+        const eventTitle = eventTitleInput.value.trim();
+        const isAllDayEvent = allDayEventToggle.checked;
+
+        if (!day) {
+          return;
+        }
+
+        if (isAllDayEvent) {
+          if (!eventTitle) {
+            return;
+          }
+          const hasStart = Boolean(startTime);
+          const hasEnd = Boolean(endTime);
+          if (hasStart !== hasEnd) {
+            return;
+          }
+          addAllDayEvent({
+            day,
+            title: eventTitle,
+            startTime: startTime || "",
+            endTime: endTime || "",
+          });
+        } else {
+          if (!member) {
+            return;
+          }
+          if (absenceTypes.has(entryType)) {
+            const resolvedAbsenceMinutes =
+              absenceMinutes || DEFAULT_FULL_DAY_MINUTES;
+            addEntry({
+              member,
+              day,
+              startTime: "",
+              endTime: "",
+              location: "",
+              entryType,
+              absenceMinutes: resolvedAbsenceMinutes,
+            });
+          } else {
+            const hasStart = Boolean(startTime);
+            const hasEnd = Boolean(endTime);
+            if (hasStart !== hasEnd) {
+              return;
+            }
+            addEntry({
+              member,
+              day,
+              startTime,
+              endTime,
+              location,
+              entryType,
+            });
+          }
+        }
+        scheduleForm.reset();
+        entryTypeSelect.value = "Dienst";
+        absenceHoursInput.value = "8,00";
+        weekInput.value = weekValue;
+        updateWeekdayHeaders(weekValue);
+        toggleEventMode(false);
+        resetEventEditState();
+        resetEntryEditState();
+        renderTable();
+      });
+
+      clearBtn.addEventListener("click", () => {
+        Object.keys(schedule).forEach((member) => {
+          delete schedule[member];
+        });
+        weekDays.forEach((day) => {
+          allDayEvents[day] = [];
+        });
+        resetEntryEditState();
+        resetEventEditState();
+        renderTable();
+      });
+
+      pdfBtn.addEventListener("click", () => {
+        window.print();
+      });
+
+      csvExportBtn.addEventListener("click", () => {
+        const delimiter = ";";
+        const header = [
+          "Typ",
+          "Mitarbeitende",
+          "Tag",
+          "Startzeit",
+          "Endzeit",
+          "Rolle/Notizen",
+          "Ereignis",
+          "Stunden (dezimal)",
+        ];
+        const rows = [header];
+
+        weekDays.forEach((day) => {
+          const events = allDayEvents[day];
+          if (!events || events.length === 0) {
+            return;
+          }
+          events.forEach((eventData) => {
+            rows.push([
+              "Ereignis",
+              "",
+              day,
+              eventData.startTime || "",
+              eventData.endTime || "",
+              "",
+              eventData.title,
+              "",
+            ]);
+          });
+        });
+
+        Object.keys(schedule)
+          .sort((a, b) => a.localeCompare(b))
+          .forEach((member) => {
+            weekDays.forEach((day) => {
+              const entry = schedule[member][day];
+              if (!entry || entry.length === 0) {
+                return;
+              }
+              const { netMinutes } = calculateDayTotals(entry);
+              entry.forEach((segment) => {
+                if (isAbsenceEntry(segment)) {
+                  const absenceMinutes =
+                    segment.absenceMinutes || DEFAULT_FULL_DAY_MINUTES;
+                  rows.push([
+                    segment.type,
+                    member,
+                    day,
+                    "",
+                    "",
+                    "",
+                    "",
+                    formatHoursDecimal(absenceMinutes),
+                  ]);
+                  return;
+                }
+                const hasTimes = segment.startTime && segment.endTime;
+                const minutes = calculateDurationMinutes(
+                  segment.startTime,
+                  segment.endTime
+                );
+                rows.push([
+                  segment.type || "Dienst",
+                  member,
+                  day,
+                  segment.startTime,
+                  segment.endTime,
+                  segment.location || "",
+                  "",
+                  hasTimes
+                    ? formatHoursDecimal(
+                        entry.length === 1 ? netMinutes : minutes
+                      )
+                    : "",
+                ]);
+              });
+            });
+          });
+
+        const csvContent = rows
+          .map((row) =>
+            row.map((value) => escapeCsvValue(value, delimiter)).join(delimiter)
+          )
+          .join("\n");
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "dienstplan.csv";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      });
+
+      csvImportBtn.addEventListener("click", () => {
+        csvFileInput.value = "";
+        csvFileInput.click();
+      });
+
+      csvFileInput.addEventListener("change", (event) => {
+        const file = event.target.files && event.target.files[0];
+        if (!file) {
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          const text = String(reader.result || "");
+          const parsed = parseCsvText(text);
+          if (!parsed.rows || parsed.rows.length <= 1) {
+            return;
+          }
+
+          Object.keys(schedule).forEach((member) => {
+            delete schedule[member];
+          });
+          weekDays.forEach((day) => {
+            allDayEvents[day] = [];
+          });
+
+          const [, ...dataRows] = parsed.rows;
+          const header = parsed.rows[0].map((cell) =>
+            cell.toLowerCase().trim()
+          );
+          const typeIndex = header.indexOf("typ");
+          const memberIndex = header.indexOf("mitarbeitende");
+          const dayIndex = header.indexOf("tag");
+          const startIndex = header.indexOf("startzeit");
+          const endIndex = header.indexOf("endzeit");
+          const locationIndex = header.indexOf("rolle/notizen");
+          const eventIndex = header.indexOf("ereignis");
+          const hoursIndex = header.indexOf("stunden (dezimal)");
+
+          dataRows.forEach((row) => {
+            if (typeIndex !== -1) {
+              const rowType = (row[typeIndex] || "").toLowerCase();
+              const day = row[dayIndex] || "";
+              if (!day) {
+                return;
+              }
+              if (rowType === "ereignis") {
+                const eventText =
+                  (eventIndex !== -1 && row[eventIndex]) ||
+                  (locationIndex !== -1 && row[locationIndex]) ||
+                  "";
+                const startTime = (startIndex !== -1 && row[startIndex]) || "";
+                const endTime = (endIndex !== -1 && row[endIndex]) || "";
+                if (!eventText) {
+                  return;
+                }
+                addAllDayEvent({
+                  day,
+                  title: eventText,
+                  startTime,
+                  endTime,
+                });
+                return;
+              }
+              if (rowType === "urlaub" || rowType === "krank") {
+                const member = row[memberIndex] || "";
+                const hoursValue = hoursIndex !== -1 ? row[hoursIndex] : "";
+                const absenceMinutes =
+                  parseHoursToMinutes(hoursValue) || DEFAULT_FULL_DAY_MINUTES;
+                if (!member) {
+                  return;
+                }
+                addEntry({
+                  member,
+                  day,
+                  startTime: "",
+                  endTime: "",
+                  location: "",
+                  entryType: rowType === "urlaub" ? "Urlaub" : "Krank",
+                  absenceMinutes,
+                });
+                return;
+              }
+              const member = row[memberIndex] || "";
+              const startTime = row[startIndex] || "";
+              const endTime = row[endIndex] || "";
+              const location =
+                (locationIndex !== -1 && row[locationIndex]) || "";
+              if (!member) {
+                return;
+              }
+              if ((startTime && !endTime) || (!startTime && endTime)) {
+                return;
+              }
+              addEntry({
+                member,
+                day,
+                startTime,
+                endTime,
+                location,
+                entryType: "Dienst",
+              });
+              return;
+            }
+
+            const [member, day, startTime, endTime, location] = row;
+            if (!member || !day) {
+              return;
+            }
+            if ((startTime && !endTime) || (!startTime && endTime)) {
+              return;
+            }
+            addEntry({
+              member,
+              day,
+              startTime,
+              endTime,
+              location: location || "",
+              entryType: "Dienst",
+            });
+          });
+
+          renderTable();
+        };
+        reader.readAsText(file, "utf-8");
+      });
+
+      scheduleBody.addEventListener("click", (event) => {
+        const cell = event.target.closest("td[data-day]");
+        if (!cell) {
+          return;
+        }
+
+        const row = cell.parentElement;
+        if (row.getAttribute("data-row-type") === "events") {
+          const day = cell.getAttribute("data-day");
+          const eventItem = event.target.closest("[data-event-index]");
+          if (!day) {
+            return;
+          }
+          allDayEventToggle.checked = true;
+          toggleEventMode(true);
+          resetEntryEditState();
+          if (eventItem) {
+            const index = Number(eventItem.getAttribute("data-event-index"));
+            const eventData = allDayEvents[day] && allDayEvents[day][index];
+            if (eventData) {
+              eventTitleInput.value = eventData.title;
+              startTimeInput.value = eventData.startTime || "";
+              endTimeInput.value = eventData.endTime || "";
+              eventEditState.day = day;
+              eventEditState.index = Number.isNaN(index) ? null : index;
+            }
+          } else {
+            eventTitleInput.value = "";
+            startTimeInput.value = "";
+            endTimeInput.value = "";
+            resetEventEditState();
+          }
+          weekdaySelect.value = day;
+          eventTitleInput.focus();
+          return;
+        }
+
+        const member = row.getAttribute("data-member");
+        const day = cell.getAttribute("data-day");
+        const entryIndexElement = event.target.closest("[data-entry-index]");
+        const entries = schedule[member] && schedule[member][day];
+        allDayEventToggle.checked = false;
+        toggleEventMode(false);
+        resetEventEditState();
+        resetEntryEditState();
+        memberInput.value = member;
+        weekdaySelect.value = day;
+        if (entries && entryIndexElement) {
+          const index = Number(
+            entryIndexElement.getAttribute("data-entry-index")
+          );
+          const entry = entries[index];
+          if (entry) {
+            entryTypeSelect.value = entry.type || "Dienst";
+            startTimeInput.value = entry.startTime || "";
+            endTimeInput.value = entry.endTime || "";
+            locationInput.value = entry.location || "";
+            absenceHoursInput.value = formatHoursDecimalInput(
+              entry.absenceMinutes || DEFAULT_FULL_DAY_MINUTES
+            );
+            entryEditState.member = member;
+            entryEditState.day = day;
+            entryEditState.index = Number.isNaN(index) ? null : index;
+            updateEntryTypeMode();
+          }
+        } else {
+          startTimeInput.value = "";
+          endTimeInput.value = "";
+          locationInput.value = "";
+          entryTypeSelect.value = "Dienst";
+          absenceHoursInput.value = "8,00";
+          resetEntryEditState();
+          updateEntryTypeMode();
+        }
+        if (absenceTypes.has(entryTypeSelect.value)) {
+          entryTypeSelect.focus();
+        } else {
+          startTimeInput.focus();
+        }
+      });
+
+      weekInput.addEventListener("change", () => {
+        updateWeekdayHeaders(weekInput.value);
+      });
+
+      allDayEventToggle.addEventListener("change", () => {
+        toggleEventMode(allDayEventToggle.checked);
+        if (allDayEventToggle.checked) {
+          resetEntryEditState();
+        }
+        if (!allDayEventToggle.checked) {
+          resetEventEditState();
+          eventTitleInput.value = "";
+          startTimeInput.value = "";
+          endTimeInput.value = "";
+        }
+      });
+
+      entryTypeSelect.addEventListener("change", () => {
+        updateEntryTypeMode();
+        if (absenceTypes.has(entryTypeSelect.value)) {
+          startTimeInput.value = "";
+          endTimeInput.value = "";
+          locationInput.value = "";
+          if (!absenceHoursInput.value) {
+            absenceHoursInput.value = "8,00";
+          }
+        }
+      });
+
+      updateWeekdayHeaders(weekInput.value);
+      toggleEventMode(false);
+      renderTable();
+    </script>
+  </body>
+</html>
