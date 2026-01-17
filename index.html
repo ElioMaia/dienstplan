@@ -154,7 +154,7 @@
         padding: 12px 10px;
         border-color: rgba(17, 19, 27, 0.08);
         font-weight: 500;
-        font-size: 0.8rem;
+        font-size: 1rem;
       }
 
       .schedule-table tbody td {
@@ -166,7 +166,7 @@
       }
 
       .event-item {
-        font-size: 0.85rem;
+        font-size: 1rem;
         font-weight: 500;
         color: #0f172a;
       }
@@ -176,7 +176,7 @@
       }
 
       .time-range {
-        font-size: 1rem;
+        font-size: 1.1rem;
       }
 
       .schedule-table th:first-child,
@@ -263,7 +263,7 @@
       }
 
       .duration-text {
-        font-size: 0.65rem;
+        font-size: 0.8rem;
         font-style: italic;
       }
 
@@ -482,11 +482,11 @@
         }
 
         .time-range {
-          font-size: 0.85rem;
+          font-size: 0.95rem;
         }
 
         .duration-text {
-          font-size: 0.55rem;
+          font-size: 0.8rem;
           font-style: italic;
         }
 
@@ -505,7 +505,8 @@
             <h1 class="display-4 fw-bold">Dienstpläne</h1>
             <p class="lead text-muted">
               Plane ausgewogene Rotationen, sieh die Abdeckung sofort und halte
-              dein Team auf einen Blick synchron.
+              dein Team auf einen Blick synchron. Die Daten bleiben lokal und
+              werden nicht gespeichert.
             </p>
           </div>
           <div class="col-lg-5">
@@ -576,7 +577,7 @@
                       type="text"
                       inputmode="decimal"
                       pattern="^[0-9]+(?:[.,][0-9]{1,2})?$"
-                      value="8,00"
+                      value="7,8"
                       disabled
                     />
                     <div class="form-text">
@@ -866,7 +867,12 @@
 
       function applyBreakRule(entries) {
         if (!entries || entries.length === 0) {
-          return { netMinutes: 0, hasBreak: false, breakEntry: null };
+          return {
+            netMinutes: 0,
+            hasBreak: false,
+            breakEntry: null,
+            breakDeductionEntry: null,
+          };
         }
         const entryWindows = entries
           .filter(isTimedEntry)
@@ -890,31 +896,53 @@
           0
         );
 
-        const needsBreak =
-          entryWindows.some((entry) => entry.duration > 6 * 60) ||
-          totalMinutes > 6 * 60;
-        const hasLongGap = entryWindows.some((entry, index) => {
-          if (index === 0) {
-            return false;
-          }
-          const previous = entryWindows[index - 1];
-          return entry.start - previous.end >= 30;
-        });
+        if (totalMinutes > 6 * 60 && entryWindows.length > 0) {
+          let cumulativeMinutes = 0;
+          let breakEntryWindow = null;
+          let breakDeductionEntryWindow = null;
+          let hasBreakGap = false;
 
-        if (needsBreak && !hasLongGap && entryWindows.length > 0) {
-          const breakCandidate =
-            entryWindows.find((entry) => entry.duration > 6 * 60) ||
-            entryWindows[entryWindows.length - 1];
+          entryWindows.forEach((entry, index) => {
+            if (breakEntryWindow) {
+              return;
+            }
+            if (cumulativeMinutes + entry.duration > 6 * 60) {
+              breakEntryWindow = entry;
+              const previous = entryWindows[index - 1];
+              if (previous) {
+                breakDeductionEntryWindow = previous;
+              } else {
+                breakDeductionEntryWindow = entry;
+              }
+              if (previous && entry.start - previous.end >= 30) {
+                hasBreakGap = true;
+              }
+            }
+            cumulativeMinutes += entry.duration;
+          });
+
+          if (breakEntryWindow && !hasBreakGap) {
+            return {
+              netMinutes: Math.max(0, totalMinutes - 30),
+              hasBreak: true,
+              breakEntry: breakEntryWindow.entry,
+              breakDeductionEntry: breakDeductionEntryWindow
+                ? breakDeductionEntryWindow.entry
+                : null,
+            };
+          }
           return {
-            netMinutes: Math.max(0, totalMinutes - 30),
-            hasBreak: true,
-            breakEntry: breakCandidate.entry,
+            netMinutes: totalMinutes,
+            hasBreak: false,
+            breakEntry: null,
+            breakDeductionEntry: null,
           };
         }
         return {
           netMinutes: totalMinutes,
           hasBreak: false,
           breakEntry: null,
+          breakDeductionEntry: null,
         };
       }
 
@@ -926,6 +954,7 @@
             shiftMinutes: 0,
             hasCountableEntry: false,
             breakEntry: null,
+            breakDeductionEntry: null,
           };
         }
         const absenceMinutes = entries
@@ -940,6 +969,7 @@
           netMinutes: shiftMinutes,
           hasBreak,
           breakEntry,
+          breakDeductionEntry,
         } = applyBreakRule(shiftEntries);
         const timedShiftEntries = shiftEntries.filter(isTimedEntry);
         const hasCountableEntry =
@@ -950,6 +980,7 @@
           shiftMinutes,
           hasCountableEntry,
           breakEntry,
+          breakDeductionEntry,
         };
       }
 
@@ -1202,13 +1233,18 @@
                 shiftMinutes,
                 hasCountableEntry,
                 breakEntry,
+                breakDeductionEntry,
               } = calculateDayTotals(entries);
               if (!hasCountableEntry) {
                 memberEligible = false;
               }
               memberMinutes += netMinutes;
 
+              let hasPreviousTimedEntry = false;
               entries.forEach((entry, index) => {
+                const shouldPlaceBreakBefore =
+                  hasBreak && breakEntry === entry && hasPreviousTimedEntry;
+
                 const line = document.createElement("div");
                 line.className = "d-flex align-items-center flex-wrap";
                 line.setAttribute("data-entry-index", String(index));
@@ -1223,7 +1259,7 @@
 
                   const duration = document.createElement("span");
                   duration.className = "text-muted duration-text";
-                  duration.textContent = `(${formatHours(absenceMinutes)})`;
+                  duration.textContent = ` (${formatHours(absenceMinutes)})`;
                   line.appendChild(duration);
                 } else {
                   const hasTimes = entry.startTime && entry.endTime;
@@ -1247,11 +1283,11 @@
                     if (
                       !isSingleShiftEntry &&
                       hasBreak &&
-                      breakEntry === entry
+                      breakDeductionEntry === entry
                     ) {
                       displayMinutes = Math.max(0, entryMinutes - 30);
                     }
-                    duration.textContent = `(${formatHours(displayMinutes)})`;
+                    duration.textContent = ` (${formatHours(displayMinutes)})`;
                     line.appendChild(duration);
                   }
 
@@ -1263,15 +1299,28 @@
                   }
                 }
 
+                if (shouldPlaceBreakBefore) {
+                  const breakNote = document.createElement("div");
+                  breakNote.className = "text-muted small";
+                  breakNote.textContent = "Pause";
+                  cell.appendChild(breakNote);
+                }
                 cell.appendChild(line);
-              });
+                if (
+                  hasBreak &&
+                  breakEntry === entry &&
+                  !hasPreviousTimedEntry
+                ) {
+                  const breakNote = document.createElement("div");
+                  breakNote.className = "text-muted small";
+                  breakNote.textContent = "Pause";
+                  cell.appendChild(breakNote);
+                }
 
-              if (hasBreak) {
-                const breakNote = document.createElement("div");
-                breakNote.className = "text-muted small";
-                breakNote.textContent = "Pause";
-                cell.appendChild(breakNote);
-              }
+                if (isTimedEntry(entry)) {
+                  hasPreviousTimedEntry = true;
+                }
+              });
             }
 
             row.appendChild(cell);
@@ -1473,7 +1522,7 @@
         }
         scheduleForm.reset();
         entryTypeSelect.value = "Dienst";
-        absenceHoursInput.value = "8,00";
+        absenceHoursInput.value = "7,8";
         weekInput.value = weekValue;
         updateWeekdayHeaders(weekValue);
         toggleEventMode(false);
@@ -1531,7 +1580,7 @@
         if (didDelete) {
           scheduleForm.reset();
           entryTypeSelect.value = "Dienst";
-          absenceHoursInput.value = "8,00";
+          absenceHoursInput.value = "7,8";
           toggleEventMode(false);
           renderTable();
         }
@@ -1592,7 +1641,7 @@
             if (!entry || entry.length === 0) {
               return;
             }
-            const { netMinutes, hasBreak, breakEntry } =
+            const { netMinutes, hasBreak, breakEntry, breakDeductionEntry } =
               calculateDayTotals(entry);
             entry.forEach((segment) => {
               if (isAbsenceEntry(segment)) {
@@ -1616,7 +1665,11 @@
                 segment.endTime
               );
               let exportMinutes = entry.length === 1 ? netMinutes : minutes;
-              if (hasBreak && breakEntry === segment && entry.length > 1) {
+              if (
+                hasBreak &&
+                breakDeductionEntry === segment &&
+                entry.length > 1
+              ) {
                 exportMinutes = Math.max(0, minutes - 30);
               }
               rows.push([
@@ -1870,7 +1923,7 @@
           endTimeInput.value = "";
           locationInput.value = "";
           entryTypeSelect.value = "Dienst";
-          absenceHoursInput.value = "8,00";
+          absenceHoursInput.value = "7,8";
           resetEntryEditState();
           updateEntryTypeMode();
         }
@@ -1907,7 +1960,7 @@
           endTimeInput.value = "";
           locationInput.value = "";
           if (!absenceHoursInput.value) {
-            absenceHoursInput.value = "8,00";
+            absenceHoursInput.value = "7,8";
           }
         }
       });
