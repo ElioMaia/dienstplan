@@ -126,7 +126,6 @@
 
       .schedule-table {
         margin: 0;
-        font-family: "IBM Plex Mono", monospace;
       }
 
       .schedule-table th {
@@ -155,6 +154,29 @@
         padding: 12px 10px;
         border-color: rgba(17, 19, 27, 0.08);
         font-weight: 500;
+        font-size: 0.8rem;
+      }
+
+      .schedule-table tbody td {
+        height: 110px;
+      }
+
+      .schedule-table tr[data-row-type="events"] td {
+        color: #0f172a;
+      }
+
+      .event-item {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #0f172a;
+      }
+
+      .event-item .event-time {
+        font-weight: 600;
+      }
+
+      .time-range {
+        font-size: 1rem;
       }
 
       .schedule-table th:first-child,
@@ -455,6 +477,14 @@
           font-size: 0.9rem;
         }
 
+        .event-item {
+          font-size: 0.8rem;
+        }
+
+        .time-range {
+          font-size: 0.85rem;
+        }
+
         .duration-text {
           font-size: 0.55rem;
           font-style: italic;
@@ -606,7 +636,7 @@
                     />
                     <div class="form-text">
                       Optional: Start- und Endzeit setzen, wenn das Ereignis
-                      einen festen Slot hat.
+                      einen festen Slot hat. Fett mit **Text**.
                     </div>
                   </div>
                 </div>
@@ -702,7 +732,6 @@
           data-placeholder="Hier kannst du Zusatzinfos, Regeln oder Hinweise eintragen. Formatierung wie Fett oder Kursiv ist möglich."
         ></div>
       </div>
-      </div>
     </main>
 
     <script>
@@ -783,6 +812,20 @@
 
       function formatHoursDecimalInput(minutes) {
         return formatHoursDecimal(minutes).replace(".", ",");
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function formatEventTitle(value) {
+        const escaped = escapeHtml(value);
+        return escaped.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
       }
 
       const DEFAULT_FULL_DAY_MINUTES = 8 * 60;
@@ -893,8 +936,11 @@
             0
           );
         const shiftEntries = entries.filter((entry) => !isAbsenceEntry(entry));
-        const { netMinutes: shiftMinutes, hasBreak, breakEntry } =
-          applyBreakRule(shiftEntries);
+        const {
+          netMinutes: shiftMinutes,
+          hasBreak,
+          breakEntry,
+        } = applyBreakRule(shiftEntries);
         const timedShiftEntries = shiftEntries.filter(isTimedEntry);
         const hasCountableEntry =
           timedShiftEntries.length > 0 || absenceMinutes > 0;
@@ -1093,7 +1139,7 @@
         weekDays.forEach((day) => {
           const cell = document.createElement("td");
           cell.setAttribute("data-day", day);
-          cell.className = "text-muted";
+          cell.className = "events-cell";
           const events = allDayEvents[day];
           if (!events || events.length === 0) {
             cell.textContent = "—";
@@ -1101,15 +1147,17 @@
             cell.textContent = "";
             events.forEach((eventData, index) => {
               const item = document.createElement("div");
-              item.className = "small text-muted";
+              item.className = "event-item";
               const timeLabel =
                 eventData.startTime && eventData.endTime
                   ? `${eventData.startTime}–${eventData.endTime}`
                   : ""; //Ganztätig Kommentar
               if (timeLabel == "") {
-                item.textContent = `${eventData.title}`;
+                item.innerHTML = formatEventTitle(eventData.title);
               } else {
-                item.textContent = `${timeLabel} · ${eventData.title}`;
+                item.innerHTML = `<span class="event-time">${escapeHtml(
+                  timeLabel
+                )}</span> · ${formatEventTitle(eventData.title)}`;
               }
               item.setAttribute("data-event-index", String(index));
               cell.appendChild(item);
@@ -1181,7 +1229,7 @@
                   const hasTimes = entry.startTime && entry.endTime;
                   if (hasTimes) {
                     const timeRange = document.createElement("span");
-                    timeRange.className = "fw-semibold";
+                    timeRange.className = "fw-semibold time-range";
                     timeRange.textContent = `${entry.startTime}–${entry.endTime}`;
                     line.appendChild(timeRange);
 
@@ -1196,7 +1244,11 @@
                     let displayMinutes = isSingleShiftEntry
                       ? shiftMinutes
                       : entryMinutes;
-                    if (!isSingleShiftEntry && hasBreak && breakEntry === entry) {
+                    if (
+                      !isSingleShiftEntry &&
+                      hasBreak &&
+                      breakEntry === entry
+                    ) {
                       displayMinutes = Math.max(0, entryMinutes - 30);
                     }
                     duration.textContent = `(${formatHours(displayMinutes)})`;
@@ -1228,7 +1280,9 @@
           const totalCell = document.createElement("td");
           totalCell.className = "fw-semibold";
           totalCell.textContent =
-            memberEligible && memberMinutes > 0 ? formatHours(memberMinutes) : "—";
+            memberEligible && memberMinutes > 0
+              ? formatHours(memberMinutes)
+              : "—";
           row.appendChild(totalCell);
 
           scheduleBody.appendChild(row);
@@ -1561,8 +1615,7 @@
                 segment.startTime,
                 segment.endTime
               );
-              let exportMinutes =
-                entry.length === 1 ? netMinutes : minutes;
+              let exportMinutes = entry.length === 1 ? netMinutes : minutes;
               if (hasBreak && breakEntry === segment && entry.length > 1) {
                 exportMinutes = Math.max(0, minutes - 30);
               }
@@ -1574,9 +1627,7 @@
                 segment.endTime,
                 segment.location || "",
                 "",
-                hasTimes
-                  ? formatHoursDecimal(exportMinutes)
-                  : "",
+                hasTimes ? formatHoursDecimal(exportMinutes) : "",
               ]);
             });
           });
@@ -1775,16 +1826,16 @@
               eventEditState.index = Number.isNaN(index) ? null : index;
             }
           } else {
-          eventTitleInput.value = "";
-          startTimeInput.value = "";
-          endTimeInput.value = "";
-          resetEventEditState();
+            eventTitleInput.value = "";
+            startTimeInput.value = "";
+            endTimeInput.value = "";
+            resetEventEditState();
+          }
+          weekdaySelect.value = day;
+          eventTitleInput.focus();
+          updateDeleteButtonState();
+          return;
         }
-        weekdaySelect.value = day;
-        eventTitleInput.focus();
-        updateDeleteButtonState();
-        return;
-      }
 
         const member = row.getAttribute("data-member");
         const day = cell.getAttribute("data-day");
