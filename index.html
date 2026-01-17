@@ -138,6 +138,16 @@
         border: none;
       }
 
+      .schedule-table th,
+      .schedule-table td {
+        border-right: 1px solid rgba(17, 19, 27, 0.08);
+      }
+
+      .schedule-table th:last-child,
+      .schedule-table td:last-child {
+        border-right: none;
+      }
+
       .schedule-table th .day-label {
         display: block;
       }
@@ -684,6 +694,15 @@
                   type="file"
                   accept=".csv,text/csv"
                 />
+                <div class="w-100"></div>
+                <div class="input-group mt-2">
+                  <span class="input-group-text">Dateiname</span>
+                  <input
+                    class="form-control"
+                    id="exportFilename"
+                    placeholder="dienstplan"
+                  />
+                </div>
               </div>
             </form>
           </div>
@@ -716,6 +735,7 @@
                       <span class="day-date d-none"></span>
                     </th>
                     <th>Summe (Std.)</th>
+                    <th>Stand VZ</th>
                   </tr>
                 </thead>
                 <tbody id="scheduleBody"></tbody>
@@ -753,6 +773,7 @@
       const csvExportBtn = document.getElementById("csvExportBtn");
       const csvImportBtn = document.getElementById("csvImportBtn");
       const csvFileInput = document.getElementById("csvFileInput");
+      const exportFilenameInput = document.getElementById("exportFilename");
       const memberCount = document.getElementById("memberCount");
       const shiftCount = document.getElementById("shiftCount");
       const scheduleBody = document.getElementById("scheduleBody");
@@ -813,6 +834,23 @@
 
       function formatHoursDecimalInput(minutes) {
         return formatHoursDecimal(minutes).replace(".", ",");
+      }
+
+      function getExportFilename(extension) {
+        const rawName = exportFilenameInput
+          ? exportFilenameInput.value.trim()
+          : "";
+        const baseName = rawName || "dienstplan";
+        const safeName = baseName.replace(/[\\/:*?"<>|]+/g, "-");
+        return `${safeName}${extension}`;
+      }
+
+      function getExportBaseName() {
+        const rawName = exportFilenameInput
+          ? exportFilenameInput.value.trim()
+          : "";
+        const baseName = rawName || "dienstplan";
+        return baseName.replace(/[\\/:*?"<>|]+/g, "-");
       }
 
       function escapeHtml(value) {
@@ -1200,6 +1238,9 @@
         const eventsTotalCell = document.createElement("td");
         eventsTotalCell.textContent = "—";
         eventsRow.appendChild(eventsTotalCell);
+        const eventsStandCell = document.createElement("td");
+        eventsStandCell.textContent = "—";
+        eventsRow.appendChild(eventsStandCell);
         scheduleBody.appendChild(eventsRow);
 
         const members = Object.keys(schedule);
@@ -1326,13 +1367,16 @@
             row.appendChild(cell);
           });
 
-          const totalCell = document.createElement("td");
-          totalCell.className = "fw-semibold";
-          totalCell.textContent =
-            memberEligible && memberMinutes > 0
-              ? formatHours(memberMinutes)
-              : "—";
-          row.appendChild(totalCell);
+        const totalCell = document.createElement("td");
+        totalCell.className = "fw-semibold";
+        totalCell.textContent =
+          memberEligible && memberMinutes > 0
+            ? formatHours(memberMinutes)
+            : "—";
+        row.appendChild(totalCell);
+        const standCell = document.createElement("td");
+        standCell.textContent = "";
+        row.appendChild(standCell);
 
           scheduleBody.appendChild(row);
         });
@@ -1589,7 +1633,12 @@
 
       pdfBtn.addEventListener("click", () => {
         syncLegendPrintState();
+        const originalTitle = document.title;
+        document.title = getExportBaseName();
         window.print();
+        setTimeout(() => {
+          document.title = originalTitle;
+        }, 0);
       });
 
       csvExportBtn.addEventListener("click", () => {
@@ -1695,7 +1744,7 @@
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = "dienstplan.csv";
+        link.download = getExportFilename(".csv");
         document.body.appendChild(link);
         link.click();
         link.remove();
