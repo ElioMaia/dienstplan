@@ -700,7 +700,7 @@
                   <input
                     class="form-control"
                     id="exportFilename"
-                    placeholder="dienstplan"
+                    placeholder="Woche"
                   />
                 </div>
               </div>
@@ -1367,16 +1367,16 @@
             row.appendChild(cell);
           });
 
-        const totalCell = document.createElement("td");
-        totalCell.className = "fw-semibold";
-        totalCell.textContent =
-          memberEligible && memberMinutes > 0
-            ? formatHours(memberMinutes)
-            : "—";
-        row.appendChild(totalCell);
-        const standCell = document.createElement("td");
-        standCell.textContent = "";
-        row.appendChild(standCell);
+          const totalCell = document.createElement("td");
+          totalCell.className = "fw-semibold";
+          totalCell.textContent =
+            memberEligible && memberMinutes > 0
+              ? formatHours(memberMinutes)
+              : "—";
+          row.appendChild(totalCell);
+          const standCell = document.createElement("td");
+          standCell.textContent = "";
+          row.appendChild(standCell);
 
           scheduleBody.appendChild(row);
         });
