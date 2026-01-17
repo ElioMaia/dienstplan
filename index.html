@@ -196,6 +196,15 @@
         vertical-align: middle;
       }
 
+      .schedule-table th.std-sum-col {
+        width: 6.4rem;
+      }
+
+      .schedule-table th.stand-vz-col {
+        font-size: 0.6rem;
+        width: 3.4rem;
+      }
+
       .shift-chip {
         display: inline-flex;
         align-items: center;
@@ -491,12 +500,12 @@
           font-size: 0.8rem;
         }
 
-        .time-range {
-          font-size: 1.6rem;
+        .schedule-table td .fw-semibold.time-range {
+          font-size: 1.2rem;
         }
 
         .duration-text {
-          font-size: 0.95rem;
+          font-size: 0.7rem;
           font-style: italic;
         }
 
@@ -734,8 +743,8 @@
                       <span class="day-label">Freitag</span>
                       <span class="day-date d-none"></span>
                     </th>
-                    <th>Summe (Std.)</th>
-                    <th>Stand VZ</th>
+                    <th class="std-sum-col">Summe (Std.)</th>
+                    <th class="stand-vz-col">Stand VZ</th>
                   </tr>
                 </thead>
                 <tbody id="scheduleBody"></tbody>
