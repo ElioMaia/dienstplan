@@ -156,7 +156,7 @@
         display: block;
         text-transform: none;
         letter-spacing: 0.04em;
-        font-size: 0.65rem;
+        font-size: 14px;
         color: rgba(248, 241, 229, 0.7);
       }
 
@@ -181,6 +181,10 @@
         color: #0f172a;
       }
 
+      .schedule-table td.stand-vz-cell {
+        font-size: 0.95rem;
+      }
+
       .event-item .event-time {
         font-weight: 600;
       }
@@ -201,8 +205,8 @@
       }
 
       .schedule-table th.stand-vz-col {
-        font-size: 0.6rem;
-        width: 3.4rem;
+        font-size: 0.85rem;
+        width: 5rem;
       }
 
       .shift-chip {
@@ -471,7 +475,7 @@
         }
 
         .legend-block {
-          font-size: 10px;
+          font-size: 12px;
         }
 
         .schedule-table {
@@ -485,6 +489,7 @@
           color: #f8f1e5 !important;
           border: none !important;
           padding: 8px 6px !important;
+          font-size: 16px !important;
         }
 
         .schedule-table td {
@@ -494,15 +499,15 @@
         }
 
         .schedule-table td .fw-semibold {
-          font-size: 12px;
+          font-size: 16px;
         }
 
         .schedule-table td:first-child strong {
-          font-size: 0.9rem;
+          font-size: 18px;
         }
 
         .event-item {
-          font-size: 0.8rem;
+          font-size: 16px;
         }
 
         .schedule-table td .fw-semibold.time-range {
@@ -512,6 +517,15 @@
         .duration-text {
           font-size: 14px;
           font-style: italic;
+        }
+
+        .schedule-table th.stand-vz-col {
+          font-size: 14px !important;
+          width: 80px !important;
+        }
+
+        .schedule-table td.stand-vz-cell {
+          font-size: 16px;
         }
 
         .schedule-table tbody tr:nth-child(even) td {
@@ -1250,10 +1264,10 @@
         });
 
         const eventsTotalCell = document.createElement("td");
-        eventsTotalCell.textContent = "—";
+        eventsTotalCell.textContent = "";
         eventsRow.appendChild(eventsTotalCell);
         const eventsStandCell = document.createElement("td");
-        eventsStandCell.textContent = "—";
+        eventsStandCell.textContent = "";
         eventsRow.appendChild(eventsStandCell);
         scheduleBody.appendChild(eventsRow);
 
@@ -1389,6 +1403,7 @@
               : "—";
           row.appendChild(totalCell);
           const standCell = document.createElement("td");
+          standCell.className = "stand-vz-cell";
           standCell.textContent = "";
           row.appendChild(standCell);
 
