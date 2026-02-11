@@ -603,6 +603,7 @@
                       <option value="Dienst">Dienst</option>
                       <option value="Urlaub">Urlaub</option>
                       <option value="Krank">Krank</option>
+                      <option value="Feiertag">Feiertag</option>
                     </select>
                   </div>
                   <div class="col-md-6">
@@ -619,7 +620,7 @@
                       disabled
                     />
                     <div class="form-text">
-                      Nur bei Urlaub/Krank erforderlich.
+                      Nur bei Urlaub/Krank/Feiertag erforderlich.
                     </div>
                   </div>
                   <div class="col-md-6">
@@ -896,7 +897,7 @@
       }
 
       const DEFAULT_FULL_DAY_MINUTES = 8 * 60;
-      const absenceTypes = new Set(["Urlaub", "Krank"]);
+      const absenceTypes = new Set(["Urlaub", "Krank", "Feiertag"]);
 
       function isAbsenceEntry(entry) {
         return entry && absenceTypes.has(entry.type);
@@ -1866,7 +1867,11 @@
                 });
                 return;
               }
-              if (rowType === "urlaub" || rowType === "krank") {
+              if (
+                rowType === "urlaub" ||
+                rowType === "krank" ||
+                rowType === "feiertag"
+              ) {
                 const member = row[memberIndex] || "";
                 const hoursValue = hoursIndex !== -1 ? row[hoursIndex] : "";
                 const absenceMinutes =
@@ -1880,7 +1885,12 @@
                   startTime: "",
                   endTime: "",
                   location: "",
-                  entryType: rowType === "urlaub" ? "Urlaub" : "Krank",
+                  entryType:
+                    rowType === "urlaub"
+                      ? "Urlaub"
+                      : rowType === "krank"
+                      ? "Krank"
+                      : "Feiertag",
                   absenceMinutes,
                 });
                 return;
