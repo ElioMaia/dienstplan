@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
@@ -47,7 +47,8 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: radial-gradient(
+        background:
+          radial-gradient(
             circle at 80% 0%,
             rgba(10, 79, 110, 0.25) 0%,
             transparent 50%
@@ -114,6 +115,16 @@
         letter-spacing: 0.14em;
         color: var(--muted);
         font-weight: 600;
+      }
+
+      .week-config {
+        display: flex;
+        align-items: flex-end;
+        gap: 16px;
+      }
+
+      .week-config .week-field {
+        flex: 1 1 260px;
       }
 
       .table-card {
@@ -569,6 +580,21 @@
         <div class="col-lg-5">
           <div class="panel h-100">
             <h2 class="h4 fw-semibold mb-3">Zum Dienstplan hinzufügen</h2>
+            <div class="form-section">
+              <div class="form-section-title mb-2">Wocheneinstellungen</div>
+              <div class="week-config">
+                <div class="week-field">
+                  <label class="form-label" for="weekSelect"
+                    >Kalenderwoche</label
+                  >
+                  <input class="form-control" id="weekSelect" type="week" />
+                  <div class="form-text">
+                    Gilt für den gesamten Wochenplan und bleibt beim Hinzufügen
+                    oder Bearbeiten von Diensten erhalten.
+                  </div>
+                </div>
+              </div>
+            </div>
             <form id="scheduleForm">
               <div class="form-section">
                 <div class="form-section-title mb-2">Dienst</div>
@@ -622,12 +648,6 @@
                     <div class="form-text">
                       Nur bei Urlaub/Krank/Feiertag erforderlich.
                     </div>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label" for="weekSelect"
-                      >Kalenderwoche</label
-                    >
-                    <input class="form-control" id="weekSelect" type="week" />
                   </div>
                   <div class="col-md-6">
                     <label class="form-label" for="startTime">Startzeit</label>
@@ -743,6 +763,7 @@
                 <thead>
                   <tr>
                     <th>Mitarbeiter</th>
+                    <th class="stand-vz-col">Stand VZ</th>
                     <th data-day="Montag">
                       <span class="day-label">Montag</span>
                       <span class="day-date d-none"></span>
@@ -764,7 +785,6 @@
                       <span class="day-date d-none"></span>
                     </th>
                     <th class="std-sum-col">Summe (Std.)</th>
-                    <th class="stand-vz-col">Stand VZ</th>
                   </tr>
                 </thead>
                 <tbody id="scheduleBody"></tbody>
@@ -808,7 +828,7 @@
       const scheduleBody = document.getElementById("scheduleBody");
       const legendContent = document.getElementById("legendContent");
       const weekdayHeaders = Array.from(
-        document.querySelectorAll("th[data-day]")
+        document.querySelectorAll("th[data-day]"),
       );
 
       const weekDays = [
@@ -960,7 +980,7 @@
 
         const totalMinutes = entryWindows.reduce(
           (sum, entry) => sum + entry.duration,
-          0
+          0,
         );
 
         if (totalMinutes > 6 * 60 && entryWindows.length > 0) {
@@ -1029,7 +1049,7 @@
           .reduce(
             (sum, entry) =>
               sum + (entry.absenceMinutes || DEFAULT_FULL_DAY_MINUTES),
-            0
+            0,
           );
         const shiftEntries = entries.filter((entry) => !isAbsenceEntry(entry));
         const {
@@ -1090,7 +1110,7 @@
           weekdayHeaders.map((header) => [
             header.getAttribute("data-day"),
             header,
-          ])
+          ]),
         );
         if (!parsed) {
           weekDays.forEach((day) => {
@@ -1130,6 +1150,20 @@
         }
         const hasContent = legendContent.innerText.trim().length > 0;
         legendBlock.classList.toggle("is-empty", !hasContent);
+      }
+
+      function resetEntryFormFields() {
+        scheduleForm.reset();
+        memberInput.value = "";
+        weekdaySelect.value = "";
+        startTimeInput.value = "";
+        endTimeInput.value = "";
+        locationInput.value = "";
+        eventTitleInput.value = "";
+        entryTypeSelect.value = "Dienst";
+        absenceHoursInput.value = "7,8";
+        allDayEventToggle.checked = false;
+        toggleEventMode(false);
       }
 
       function escapeCsvValue(value, delimiter) {
@@ -1234,6 +1268,11 @@
         eventsLabelCell.innerHTML = "<strong>Ereignisse</strong>";
         eventsRow.appendChild(eventsLabelCell);
 
+        const eventsStandCell = document.createElement("td");
+        eventsStandCell.className = "stand-vz-cell";
+        eventsStandCell.textContent = "";
+        eventsRow.appendChild(eventsStandCell);
+
         weekDays.forEach((day) => {
           const cell = document.createElement("td");
           cell.setAttribute("data-day", day);
@@ -1254,7 +1293,7 @@
                 item.innerHTML = formatEventTitle(eventData.title);
               } else {
                 item.innerHTML = `<span class="event-time">${escapeHtml(
-                  timeLabel
+                  timeLabel,
                 )}</span> · ${formatEventTitle(eventData.title)}`;
               }
               item.setAttribute("data-event-index", String(index));
@@ -1267,9 +1306,6 @@
         const eventsTotalCell = document.createElement("td");
         eventsTotalCell.textContent = "";
         eventsRow.appendChild(eventsTotalCell);
-        const eventsStandCell = document.createElement("td");
-        eventsStandCell.textContent = "";
-        eventsRow.appendChild(eventsStandCell);
         scheduleBody.appendChild(eventsRow);
 
         const members = Object.keys(schedule);
@@ -1281,6 +1317,11 @@
           const nameCell = document.createElement("td");
           nameCell.innerHTML = `<strong>${member}</strong>`;
           row.appendChild(nameCell);
+
+          const standCell = document.createElement("td");
+          standCell.className = "stand-vz-cell";
+          standCell.textContent = "";
+          row.appendChild(standCell);
 
           let memberMinutes = 0;
           let memberEligible = true;
@@ -1341,7 +1382,7 @@
 
                     const entryMinutes = calculateDurationMinutes(
                       entry.startTime,
-                      entry.endTime
+                      entry.endTime,
                     );
                     const duration = document.createElement("span");
                     duration.className = "text-muted duration-text";
@@ -1403,10 +1444,6 @@
               ? formatHours(memberMinutes)
               : "—";
           row.appendChild(totalCell);
-          const standCell = document.createElement("td");
-          standCell.className = "stand-vz-cell";
-          standCell.textContent = "";
-          row.appendChild(standCell);
 
           scheduleBody.appendChild(row);
         });
@@ -1452,7 +1489,7 @@
           schedule[member][day] = [entryData];
         } else {
           schedule[member][day] = entries.filter(
-            (entry) => !isAbsenceEntry(entry)
+            (entry) => !isAbsenceEntry(entry),
           );
         }
       }
@@ -1532,7 +1569,6 @@
 
       scheduleForm.addEventListener("submit", (event) => {
         event.preventDefault();
-        const weekValue = weekInput.value;
         const member = memberInput.value.trim();
         const day = weekdaySelect.value;
         const startTime = startTimeInput.value;
@@ -1594,12 +1630,7 @@
             });
           }
         }
-        scheduleForm.reset();
-        entryTypeSelect.value = "Dienst";
-        absenceHoursInput.value = "7,8";
-        weekInput.value = weekValue;
-        updateWeekdayHeaders(weekValue);
-        toggleEventMode(false);
+        resetEntryFormFields();
         resetEventEditState();
         resetEntryEditState();
         updateDeleteButtonState();
@@ -1613,6 +1644,7 @@
         weekDays.forEach((day) => {
           allDayEvents[day] = [];
         });
+        resetEntryFormFields();
         resetEntryEditState();
         resetEventEditState();
         updateDeleteButtonState();
@@ -1652,10 +1684,7 @@
         }
 
         if (didDelete) {
-          scheduleForm.reset();
-          entryTypeSelect.value = "Dienst";
-          absenceHoursInput.value = "7,8";
-          toggleEventMode(false);
+          resetEntryFormFields();
           renderTable();
         }
         updateDeleteButtonState();
@@ -1741,7 +1770,7 @@
               const hasTimes = segment.startTime && segment.endTime;
               const minutes = calculateDurationMinutes(
                 segment.startTime,
-                segment.endTime
+                segment.endTime,
               );
               let exportMinutes = entry.length === 1 ? netMinutes : minutes;
               if (
@@ -1767,7 +1796,9 @@
 
         const csvContent = rows
           .map((row) =>
-            row.map((value) => escapeCsvValue(value, delimiter)).join(delimiter)
+            row
+              .map((value) => escapeCsvValue(value, delimiter))
+              .join(delimiter),
           )
           .join("\n");
         const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
@@ -1809,7 +1840,7 @@
 
           const [, ...dataRows] = parsed.rows;
           const header = parsed.rows[0].map((cell) =>
-            cell.toLowerCase().trim()
+            cell.toLowerCase().trim(),
           );
           const typeIndex = header.indexOf("typ");
           const memberIndex = header.indexOf("mitarbeitende");
@@ -1889,8 +1920,8 @@
                     rowType === "urlaub"
                       ? "Urlaub"
                       : rowType === "krank"
-                      ? "Krank"
-                      : "Feiertag",
+                        ? "Krank"
+                        : "Feiertag",
                   absenceMinutes,
                 });
                 return;
@@ -1990,7 +2021,7 @@
         weekdaySelect.value = day;
         if (entries && entryIndexElement) {
           const index = Number(
-            entryIndexElement.getAttribute("data-entry-index")
+            entryIndexElement.getAttribute("data-entry-index"),
           );
           const entry = entries[index];
           if (entry) {
@@ -1999,7 +2030,7 @@
             endTimeInput.value = entry.endTime || "";
             locationInput.value = entry.location || "";
             absenceHoursInput.value = formatHoursDecimalInput(
-              entry.absenceMinutes || DEFAULT_FULL_DAY_MINUTES
+              entry.absenceMinutes || DEFAULT_FULL_DAY_MINUTES,
             );
             entryEditState.member = member;
             entryEditState.day = day;
