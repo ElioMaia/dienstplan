@@ -23,6 +23,8 @@
         --moss: #4f7c58;
         --rose: #e36c5b;
         --night: #151a2e;
+        --print-scale: 1;
+        --print-sheet-width: auto;
       }
 
       body {
@@ -410,6 +412,133 @@
         }
       }
 
+      body.pdf-export-mode {
+        background: #ffffff;
+        color: #0f172a;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      body.pdf-export-mode .hero,
+      body.pdf-export-mode .panel,
+      body.pdf-export-mode .summary-card,
+      body.pdf-export-mode .legend,
+      body.pdf-export-mode form,
+      body.pdf-export-mode #pdfBtn,
+      body.pdf-export-mode #clearBtn {
+        display: none !important;
+      }
+
+      body.pdf-export-mode #printContent {
+        width: var(--print-sheet-width);
+        max-width: var(--print-sheet-width);
+        padding-bottom: 0 !important;
+        margin: 0 auto;
+        zoom: var(--print-scale);
+      }
+
+      body.pdf-export-mode .container-fluid {
+        max-width: 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+
+      body.pdf-export-mode .row {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+      }
+
+      body.pdf-export-mode .col-lg-5 {
+        display: none !important;
+      }
+
+      body.pdf-export-mode .col-lg-7 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+      }
+
+      body.pdf-export-mode .table-card {
+        box-shadow: 0 0 0 1px rgba(17, 19, 27, 0.12);
+        border: 1px solid rgba(17, 19, 27, 0.12);
+        background: #ffffff;
+        border-radius: 16px;
+        width: 100%;
+      }
+
+      body.pdf-export-mode .table-responsive {
+        overflow: visible !important;
+      }
+
+      body.pdf-export-mode .legend-block {
+        border: 1px dashed rgba(17, 19, 27, 0.35);
+        background: #ffffff;
+        page-break-inside: avoid;
+        font-size: 12px;
+      }
+
+      body.pdf-export-mode .legend-block.is-empty {
+        display: none !important;
+      }
+
+      body.pdf-export-mode .legend-content {
+        border: 1px solid rgba(17, 19, 27, 0.2);
+        background: #ffffff;
+      }
+
+      body.pdf-export-mode .schedule-table {
+        font-size: 10px;
+        width: 100%;
+        table-layout: fixed;
+      }
+
+      body.pdf-export-mode .schedule-table th {
+        background: var(--night) !important;
+        color: #f8f1e5 !important;
+        border: none !important;
+        padding: 8px 6px !important;
+        font-size: 16px !important;
+      }
+
+      body.pdf-export-mode .schedule-table td {
+        padding: 6px 6px !important;
+        border-color: rgba(17, 19, 27, 0.12) !important;
+        vertical-align: top;
+      }
+
+      body.pdf-export-mode .schedule-table td .fw-semibold {
+        font-size: 16px;
+      }
+
+      body.pdf-export-mode .schedule-table td:first-child strong {
+        font-size: 18px;
+      }
+
+      body.pdf-export-mode .event-item {
+        font-size: 16px;
+      }
+
+      body.pdf-export-mode .schedule-table td .fw-semibold.time-range {
+        font-size: 18px;
+      }
+
+      body.pdf-export-mode .duration-text {
+        font-size: 14px;
+        font-style: italic;
+      }
+
+      body.pdf-export-mode .schedule-table th.stand-vz-col {
+        font-size: 14px !important;
+        width: 80px !important;
+      }
+
+      body.pdf-export-mode .schedule-table td.stand-vz-cell {
+        font-size: 16px;
+      }
+
+      body.pdf-export-mode .schedule-table tbody tr:nth-child(even) td {
+        background: #f7f3ec;
+      }
+
       @media print {
         @page {
           size: A4 landscape;
@@ -438,6 +567,10 @@
           display: none !important;
         }
 
+        #printContent {
+          zoom: var(--print-scale);
+        }
+
         main {
           padding-bottom: 0 !important;
         }
@@ -451,6 +584,10 @@
         .row {
           margin-left: 0 !important;
           margin-right: 0 !important;
+        }
+
+        .col-lg-5 {
+          display: none !important;
         }
 
         .col-lg-7 {
@@ -575,7 +712,7 @@
       </div>
     </header>
 
-    <main class="container-fluid pb-5 px-4">
+    <main class="container-fluid pb-5 px-4" id="printContent">
       <div class="row g-4 mb-4">
         <div class="col-lg-5">
           <div class="panel h-100">
@@ -827,6 +964,7 @@
       const shiftCount = document.getElementById("shiftCount");
       const scheduleBody = document.getElementById("scheduleBody");
       const legendContent = document.getElementById("legendContent");
+      const printContent = document.getElementById("printContent");
       const weekdayHeaders = Array.from(
         document.querySelectorAll("th[data-day]"),
       );
@@ -1150,6 +1288,51 @@
         }
         const hasContent = legendContent.innerText.trim().length > 0;
         legendBlock.classList.toggle("is-empty", !hasContent);
+      }
+
+      function getPixelsPerMillimeter() {
+        const probe = document.createElement("div");
+        probe.style.position = "absolute";
+        probe.style.visibility = "hidden";
+        probe.style.width = "100mm";
+        document.body.appendChild(probe);
+        const pixelsPerMillimeter = probe.getBoundingClientRect().width / 100;
+        probe.remove();
+        return pixelsPerMillimeter;
+      }
+
+      function preparePdfExport() {
+        const pixelsPerMillimeter = getPixelsPerMillimeter();
+        const printableWidth = (297 - 20) * pixelsPerMillimeter;
+        const printableHeight = (210 - 20) * pixelsPerMillimeter;
+
+        document.body.style.setProperty(
+          "--print-sheet-width",
+          `${printableWidth}px`,
+        );
+        document.body.style.setProperty("--print-scale", "1");
+        document.body.classList.add("pdf-export-mode");
+
+        const contentWidth = Math.max(printContent.scrollWidth, 1);
+        const contentHeight = Math.max(printContent.scrollHeight, 1);
+        const scale = Math.min(
+          1,
+          printableWidth / contentWidth,
+          printableHeight / contentHeight,
+        );
+        const adjustedSheetWidth = printableWidth / scale;
+
+        document.body.style.setProperty(
+          "--print-sheet-width",
+          `${adjustedSheetWidth}px`,
+        );
+        document.body.style.setProperty("--print-scale", scale.toFixed(4));
+
+        return () => {
+          document.body.classList.remove("pdf-export-mode");
+          document.body.style.removeProperty("--print-scale");
+          document.body.style.removeProperty("--print-sheet-width");
+        };
       }
 
       function resetEntryFormFields() {
@@ -1694,10 +1877,30 @@
         syncLegendPrintState();
         const originalTitle = document.title;
         document.title = getExportBaseName();
-        window.print();
-        setTimeout(() => {
+        const restorePdfExport = preparePdfExport();
+        let didCleanup = false;
+        const cleanupAfterPrint = () => {
+          if (didCleanup) {
+            return;
+          }
+          didCleanup = true;
           document.title = originalTitle;
-        }, 0);
+          restorePdfExport();
+        };
+
+        window.addEventListener("afterprint", cleanupAfterPrint, {
+          once: true,
+        });
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            try {
+              window.print();
+            } finally {
+              setTimeout(cleanupAfterPrint, 1000);
+            }
+          });
+        });
       });
 
       csvExportBtn.addEventListener("click", () => {
