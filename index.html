@@ -1095,8 +1095,8 @@
           return {
             netMinutes: 0,
             hasBreak: false,
-            breakEntry: null,
-            breakDeductionEntry: null,
+            breakEntries: new Set(),
+            breakDeductionEntries: new Set(),
           };
         }
         const entryWindows = entries
@@ -1121,53 +1121,75 @@
           0,
         );
 
-        if (totalMinutes > 6 * 60 && entryWindows.length > 0) {
-          let cumulativeMinutes = 0;
-          let breakEntryWindow = null;
-          let breakDeductionEntryWindow = null;
-          let hasBreakGap = false;
+        if (entryWindows.length > 0) {
+          let netMinutes = totalMinutes;
+          let hasBreak = false;
+          const breakEntries = new Set();
+          const breakDeductionEntries = new Set();
+          const blocks = [];
+          let currentBlock = [];
 
           entryWindows.forEach((entry, index) => {
-            if (breakEntryWindow) {
+            if (index === 0) {
+              currentBlock.push(entry);
               return;
             }
-            if (cumulativeMinutes + entry.duration > 6 * 60) {
-              breakEntryWindow = entry;
-              const previous = entryWindows[index - 1];
-              if (previous) {
-                breakDeductionEntryWindow = previous;
-              } else {
-                breakDeductionEntryWindow = entry;
-              }
-              if (previous && entry.start - previous.end >= 30) {
-                hasBreakGap = true;
-              }
+
+            const previous = entryWindows[index - 1];
+            if (entry.start - previous.end >= 30) {
+              blocks.push(currentBlock);
+              currentBlock = [entry];
+              return;
             }
-            cumulativeMinutes += entry.duration;
+
+            currentBlock.push(entry);
           });
 
-          if (breakEntryWindow && !hasBreakGap) {
-            return {
-              netMinutes: Math.max(0, totalMinutes - 30),
-              hasBreak: true,
-              breakEntry: breakEntryWindow.entry,
-              breakDeductionEntry: breakDeductionEntryWindow
-                ? breakDeductionEntryWindow.entry
-                : null,
-            };
+          if (currentBlock.length > 0) {
+            blocks.push(currentBlock);
           }
+
+          blocks.forEach((block) => {
+            const blockMinutes = block.reduce(
+              (sum, entry) => sum + entry.duration,
+              0,
+            );
+
+            if (blockMinutes <= 6 * 60) {
+              return;
+            }
+
+            hasBreak = true;
+            netMinutes = Math.max(0, netMinutes - 30);
+
+            let cumulativeMinutes = 0;
+            let breakWindow = block[block.length - 1];
+            block.forEach((entry) => {
+              if (breakWindow !== block[block.length - 1]) {
+                return;
+              }
+              if (cumulativeMinutes + entry.duration > 6 * 60) {
+                breakWindow = entry;
+              }
+              cumulativeMinutes += entry.duration;
+            });
+
+            breakEntries.add(breakWindow.entry);
+            breakDeductionEntries.add(breakWindow.entry);
+          });
+
           return {
-            netMinutes: totalMinutes,
-            hasBreak: false,
-            breakEntry: null,
-            breakDeductionEntry: null,
+            netMinutes,
+            hasBreak,
+            breakEntries,
+            breakDeductionEntries,
           };
         }
         return {
           netMinutes: totalMinutes,
           hasBreak: false,
-          breakEntry: null,
-          breakDeductionEntry: null,
+          breakEntries: new Set(),
+          breakDeductionEntries: new Set(),
         };
       }
 
@@ -1178,8 +1200,8 @@
             hasBreak: false,
             shiftMinutes: 0,
             hasCountableEntry: false,
-            breakEntry: null,
-            breakDeductionEntry: null,
+            breakEntries: new Set(),
+            breakDeductionEntries: new Set(),
           };
         }
         const absenceMinutes = entries
@@ -1193,8 +1215,8 @@
         const {
           netMinutes: shiftMinutes,
           hasBreak,
-          breakEntry,
-          breakDeductionEntry,
+          breakEntries,
+          breakDeductionEntries,
         } = applyBreakRule(shiftEntries);
         const timedShiftEntries = shiftEntries.filter(isTimedEntry);
         const hasCountableEntry =
@@ -1204,8 +1226,8 @@
           hasBreak,
           shiftMinutes,
           hasCountableEntry,
-          breakEntry,
-          breakDeductionEntry,
+          breakEntries,
+          breakDeductionEntries,
         };
       }
 
@@ -1526,19 +1548,15 @@
                 hasBreak,
                 shiftMinutes,
                 hasCountableEntry,
-                breakEntry,
-                breakDeductionEntry,
+                breakEntries,
+                breakDeductionEntries,
               } = calculateDayTotals(entries);
               if (!hasCountableEntry) {
                 memberEligible = false;
               }
               memberMinutes += netMinutes;
 
-              let hasPreviousTimedEntry = false;
               entries.forEach((entry, index) => {
-                const shouldPlaceBreakBefore =
-                  hasBreak && breakEntry === entry && hasPreviousTimedEntry;
-
                 const line = document.createElement("div");
                 line.className = "d-flex align-items-center flex-wrap";
                 line.setAttribute("data-entry-index", String(index));
@@ -1577,7 +1595,7 @@
                     if (
                       !isSingleShiftEntry &&
                       hasBreak &&
-                      breakDeductionEntry === entry
+                      breakDeductionEntries.has(entry)
                     ) {
                       displayMinutes = Math.max(0, entryMinutes - 30);
                     }
@@ -1593,26 +1611,15 @@
                   }
                 }
 
-                if (shouldPlaceBreakBefore) {
-                  const breakNote = document.createElement("div");
-                  breakNote.className = "text-muted small";
-                  breakNote.textContent = "Pause";
-                  cell.appendChild(breakNote);
-                }
                 cell.appendChild(line);
                 if (
                   hasBreak &&
-                  breakEntry === entry &&
-                  !hasPreviousTimedEntry
+                  breakEntries.has(entry)
                 ) {
                   const breakNote = document.createElement("div");
                   breakNote.className = "text-muted small";
                   breakNote.textContent = "Pause";
                   cell.appendChild(breakNote);
-                }
-
-                if (isTimedEntry(entry)) {
-                  hasPreviousTimedEntry = true;
                 }
               });
             }
@@ -1952,7 +1959,11 @@
             if (!entry || entry.length === 0) {
               return;
             }
-            const { netMinutes, hasBreak, breakEntry, breakDeductionEntry } =
+            const {
+              netMinutes,
+              hasBreak,
+              breakDeductionEntries,
+            } =
               calculateDayTotals(entry);
             entry.forEach((segment) => {
               if (isAbsenceEntry(segment)) {
@@ -1978,7 +1989,7 @@
               let exportMinutes = entry.length === 1 ? netMinutes : minutes;
               if (
                 hasBreak &&
-                breakDeductionEntry === segment &&
+                breakDeductionEntries.has(segment) &&
                 entry.length > 1
               ) {
                 exportMinutes = Math.max(0, minutes - 30);
