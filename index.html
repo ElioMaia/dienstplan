@@ -40,7 +40,7 @@
       }
 
       .hero {
-        padding: 48px 0 24px;
+        padding: 28px 0 14px;
         position: relative;
         overflow: hidden;
       }
@@ -72,9 +72,9 @@
         background: var(--night);
         color: #f8f1e5;
         letter-spacing: 0.08em;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         text-transform: uppercase;
-        padding: 0.35rem 0.75rem;
+        padding: 0.25rem 0.65rem;
         border-radius: 999px;
         display: inline-flex;
         align-items: center;
@@ -91,9 +91,9 @@
 
       .panel {
         background: rgba(255, 255, 255, 0.8);
-        border-radius: 24px;
-        box-shadow: 0 24px 55px rgba(14, 18, 41, 0.12);
-        padding: 28px;
+        border-radius: 20px;
+        box-shadow: 0 18px 40px rgba(14, 18, 41, 0.10);
+        padding: 22px;
         backdrop-filter: blur(16px);
         border: 1px solid rgba(17, 19, 27, 0.08);
       }
@@ -105,10 +105,45 @@
 
       .form-section {
         background: rgba(255, 255, 255, 0.75);
-        border-radius: 18px;
+        border-radius: 14px;
         border: 1px solid rgba(17, 19, 27, 0.08);
-        padding: 16px;
-        margin-bottom: 16px;
+        padding: 14px;
+        margin-bottom: 12px;
+      }
+
+      .form-details {
+        padding: 0;
+      }
+
+      .form-details > summary {
+        padding: 12px 14px;
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+      }
+
+      .form-details > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .form-details > summary::after {
+        content: "›";
+        font-size: 1.3rem;
+        font-weight: 300;
+        color: var(--muted);
+        transition: transform 0.2s ease;
+        transform: rotate(90deg);
+      }
+
+      .form-details[open] > summary::after {
+        transform: rotate(-90deg);
+      }
+
+      .form-details > div {
+        padding: 0 14px 14px;
       }
 
       .form-section-title {
@@ -129,12 +164,82 @@
         flex: 1 1 260px;
       }
 
+      .week-nav {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .week-nav .form-control {
+        flex: 1;
+      }
+
+      .btn-week-nav {
+        flex: 0 0 36px;
+        width: 36px;
+        height: 38px;
+        border-radius: 10px;
+        border: 1px solid rgba(17, 19, 27, 0.15);
+        background: rgba(255, 255, 255, 0.8);
+        color: var(--ink);
+        font-size: 1.3rem;
+        font-weight: 300;
+        line-height: 1;
+        padding: 0;
+        cursor: pointer;
+        transition: all 0.18s ease;
+      }
+
+      .btn-week-nav:hover {
+        background: var(--night);
+        color: #f8f1e5;
+        border-color: var(--night);
+      }
+
       .table-card {
-        border-radius: 28px;
+        border-radius: 20px;
         overflow: hidden;
         border: 1px solid rgba(17, 19, 27, 0.08);
         background: #fffdf8;
-        box-shadow: 0 20px 45px rgba(13, 20, 32, 0.15);
+        box-shadow: 0 16px 36px rgba(13, 20, 32, 0.12);
+        position: relative;
+      }
+
+      .table-empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        text-align: center;
+        border-top: 1px solid rgba(17, 19, 27, 0.06);
+      }
+
+      .table-empty-icon {
+        font-size: 2.2rem;
+        font-weight: 300;
+        color: var(--muted);
+        opacity: 0.4;
+        margin-bottom: 8px;
+        line-height: 1;
+      }
+
+      .table-empty-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 4px;
+      }
+
+      .table-empty-hint {
+        font-size: 0.85rem;
+        color: var(--muted);
+        max-width: 320px;
+      }
+
+      /* Hide empty-state when member rows exist */
+      .table-card:has(tr[data-member]) .table-empty-state {
+        display: none;
       }
 
       .schedule-table {
@@ -144,11 +249,14 @@
       .schedule-table th {
         background: var(--night);
         color: #f8f1e5;
-        padding: 16px;
+        padding: 12px 14px;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         border: none;
+        position: sticky;
+        top: 0;
+        z-index: 2;
       }
 
       .schedule-table th,
@@ -174,14 +282,43 @@
       }
 
       .schedule-table td {
-        padding: 12px 10px;
+        padding: 10px 8px;
         border-color: rgba(17, 19, 27, 0.08);
         font-weight: 500;
-        font-size: 1rem;
+        font-size: 0.95rem;
+        transition: background 0.15s ease;
       }
 
       .schedule-table tbody td {
-        height: 110px;
+        height: 88px;
+      }
+
+      .schedule-table tbody tr:hover td {
+        background: rgba(244, 163, 64, 0.08);
+      }
+
+      .schedule-table tbody tr[data-row-type="events"]:hover td {
+        background: rgba(10, 79, 110, 0.06);
+      }
+
+      .schedule-table td[data-day]:hover {
+        background: rgba(244, 163, 64, 0.14);
+        cursor: pointer;
+      }
+
+      .schedule-table td.cell-active {
+        outline: 2px solid var(--ocean);
+        outline-offset: -2px;
+        background: rgba(10, 79, 110, 0.06);
+      }
+
+      @keyframes cellFlash {
+        0% { background: rgba(79, 124, 88, 0.35); }
+        100% { background: transparent; }
+      }
+
+      .schedule-table td.cell-flash {
+        animation: cellFlash 1.2s ease-out;
       }
 
       .schedule-table tr[data-row-type="events"] td {
@@ -215,6 +352,18 @@
 
       .schedule-table th.std-sum-col {
         width: 6.4rem;
+      }
+
+      .total-cell.total-ok {
+        color: var(--moss);
+      }
+
+      .total-cell.total-under {
+        color: #b5730a;
+      }
+
+      .total-cell.total-over {
+        color: var(--rose);
       }
 
       .schedule-table th.stand-vz-col {
@@ -280,29 +429,39 @@
         font-style: italic;
       }
 
+      .schedule-table .text-muted.small:not(.w-100) {
+        color: var(--ocean) !important;
+        font-size: 0.72rem !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-top: 2px;
+      }
+
       .legend-block {
-        border: 1px dashed rgba(17, 19, 27, 0.2);
-        border-radius: 18px;
-        padding: 16px;
-        background: rgba(255, 255, 255, 0.75);
+        border: 1px dashed rgba(17, 19, 27, 0.18);
+        border-radius: 14px;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.7);
       }
 
       .legend-title {
-        font-size: 0.72rem;
+        font-size: 0.68rem;
         text-transform: uppercase;
         letter-spacing: 0.14em;
         color: var(--muted);
         font-weight: 600;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
       }
 
       .legend-content {
-        min-height: 72px;
-        border-radius: 12px;
-        padding: 10px 12px;
-        border: 1px solid rgba(17, 19, 27, 0.12);
+        min-height: 48px;
+        border-radius: 10px;
+        padding: 8px 10px;
+        border: 1px solid rgba(17, 19, 27, 0.10);
         background: #fffdf8;
         color: var(--ink);
+        font-size: 0.9rem;
       }
 
       .legend-content:empty::before {
@@ -313,30 +472,118 @@
       .btn-primary {
         background: var(--night);
         border-color: var(--night);
-        box-shadow: 0 10px 18px rgba(21, 26, 46, 0.25);
+        box-shadow: 0 8px 16px rgba(21, 26, 46, 0.22);
+        transition: all 0.18s ease;
       }
 
       .btn-primary:hover {
         background: #0e1224;
         border-color: #0e1224;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px rgba(21, 26, 46, 0.28);
       }
 
       .btn-outline-dark {
-        border-radius: 999px;
+        border-radius: 10px;
+        transition: all 0.18s ease;
+      }
+
+      .btn-outline-dark:hover {
+        background: var(--night);
+        color: #f8f1e5;
+      }
+
+      .btn-outline-danger {
+        border-radius: 10px;
+        transition: all 0.18s ease;
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: var(--ocean);
+        box-shadow: 0 0 0 3px rgba(10, 79, 110, 0.15);
+      }
+
+      .form-control.is-invalid {
+        border-color: var(--rose);
+        background: rgba(227, 108, 91, 0.06);
+      }
+
+      .form-control.is-invalid:focus {
+        border-color: var(--rose);
+        box-shadow: 0 0 0 3px rgba(227, 108, 91, 0.18);
       }
 
       .action-buttons {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 8px;
       }
 
       .action-buttons .btn {
-        flex: 1 1 160px;
+        flex: 1 1 140px;
+        border-radius: 10px;
+        font-size: 0.88rem;
+        font-weight: 500;
       }
 
       .action-buttons .btn-primary {
-        flex-basis: 220px;
+        flex-basis: 100%;
+      }
+
+      .plan-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .plan-toolbar .btn {
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        padding: 0.42rem 0.85rem;
+      }
+
+      .plan-toolbar .toolbar-spacer {
+        flex: 1;
+      }
+
+      .plan-toolbar .filename-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(17, 19, 27, 0.12);
+        border-radius: 10px;
+        padding: 2px 8px 2px 12px;
+        transition: border-color 0.18s ease;
+      }
+
+      .plan-toolbar .filename-group:focus-within {
+        border-color: var(--ocean);
+      }
+
+      .plan-toolbar .filename-group .form-control {
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        padding: 0.4rem 0;
+        width: 130px;
+        font-size: 0.85rem;
+      }
+
+      .plan-toolbar .filename-group .form-control:focus {
+        box-shadow: none;
+      }
+
+      .plan-toolbar .filename-group .input-group-text {
+        background: transparent;
+        border: none;
+        font-size: 0.78rem;
+        color: var(--muted);
+        padding: 0;
       }
 
       .fade-in {
@@ -377,11 +624,27 @@
 
       @media (max-width: 768px) {
         .hero {
-          padding: 32px 0 16px;
+          padding: 20px 0 10px;
         }
 
         .panel {
-          padding: 20px;
+          padding: 16px;
+        }
+
+        .plan-toolbar {
+          gap: 6px;
+        }
+
+        .plan-toolbar .btn {
+          flex: 1 1 calc(50% - 6px);
+        }
+
+        .plan-toolbar .filename-group {
+          flex: 1 1 100%;
+        }
+
+        .schedule-table tbody td {
+          height: 64px;
         }
       }
 
@@ -395,6 +658,8 @@
       body.pdf-export-mode .hero,
       body.pdf-export-mode .panel,
       body.pdf-export-mode .legend,
+      body.pdf-export-mode .plan-toolbar,
+      body.pdf-export-mode .table-empty-state,
       body.pdf-export-mode form,
       body.pdf-export-mode #pdfBtn,
       body.pdf-export-mode #clearBtn {
@@ -420,11 +685,11 @@
         margin-right: 0 !important;
       }
 
-      body.pdf-export-mode .col-lg-5 {
+      body.pdf-export-mode .col-lg-4 {
         display: none !important;
       }
 
-      body.pdf-export-mode .col-lg-7 {
+      body.pdf-export-mode .col-lg-8 {
         flex: 0 0 100% !important;
         max-width: 100% !important;
       }
@@ -532,6 +797,8 @@
         .hero,
         .panel,
         .legend,
+        .plan-toolbar,
+        .table-empty-state,
         form,
         #pdfBtn,
         #clearBtn {
@@ -557,11 +824,11 @@
           margin-right: 0 !important;
         }
 
-        .col-lg-5 {
+        .col-lg-4 {
           display: none !important;
         }
 
-        .col-lg-7 {
+        .col-lg-8 {
           flex: 0 0 100% !important;
           max-width: 100% !important;
         }
@@ -658,9 +925,9 @@
       <div class="container hero-content">
         <div class="row align-items-center g-4">
           <div>
-            <div class="badge-pill mb-3"><span></span>Dienstplan Studio</div>
-            <h1 class="display-4 fw-bold">Dienstpläne</h1>
-            <p class="lead text-muted">
+            <div class="badge-pill mb-2"><span></span>Dienstplan Studio</div>
+            <h1 class="h2 fw-bold mb-1">Dienstpläne</h1>
+            <p class="text-muted mb-0" style="font-size: 0.95rem;">
               Plane ausgewogene Rotationen, sieh die Abdeckung sofort und halte
               dein Team auf einen Blick synchron. Die Daten bleiben lokal und
               werden nicht gespeichert.
@@ -671,10 +938,42 @@
     </header>
 
     <main class="container-fluid pb-5 px-4" id="printContent">
+      <div class="plan-toolbar">
+        <button class="btn btn-outline-dark" type="button" id="clearBtn">
+          Woche leeren
+        </button>
+        <button class="btn btn-outline-dark" type="button" id="pdfBtn">
+          PDF exportieren
+        </button>
+        <button class="btn btn-outline-dark" type="button" id="csvExportBtn">
+          CSV exportieren
+        </button>
+        <button class="btn btn-outline-dark" type="button" id="csvImportBtn">
+          CSV importieren
+        </button>
+        <button class="btn btn-outline-dark" type="button" id="saveBtn" title="In die zuletzt importierte Datei speichern" disabled>
+          Speichern
+        </button>
+        <input
+          class="d-none"
+          id="csvFileInput"
+          type="file"
+          accept=".csv,text/csv"
+        />
+        <div class="toolbar-spacer"></div>
+        <div class="filename-group">
+          <span class="input-group-text">Dateiname</span>
+          <input
+            class="form-control"
+            id="exportFilename"
+            placeholder="Woche"
+          />
+        </div>
+      </div>
       <div class="row g-4 mb-4">
-        <div class="col-lg-5">
+        <div class="col-lg-4">
           <div class="panel h-100">
-            <h2 class="h4 fw-semibold mb-3">Zum Dienstplan hinzufügen</h2>
+            <h2 class="h6 fw-semibold mb-3 text-uppercase" style="letter-spacing: 0.06em; color: var(--muted);">Dienst hinzufügen</h2>
             <div class="form-section">
               <div class="form-section-title mb-2">Wocheneinstellungen</div>
               <div class="week-config">
@@ -682,10 +981,13 @@
                   <label class="form-label" for="weekSelect"
                     >Kalenderwoche</label
                   >
-                  <input class="form-control" id="weekSelect" type="week" />
+                  <div class="week-nav">
+                    <button type="button" class="btn btn-week-nav" id="weekPrevBtn" title="Vorherige Woche">‹</button>
+                    <input class="form-control" id="weekSelect" type="week" />
+                    <button type="button" class="btn btn-week-nav" id="weekNextBtn" title="Nächste Woche">›</button>
+                  </div>
                   <div class="form-text">
-                    Gilt für den gesamten Wochenplan und bleibt beim Hinzufügen
-                    oder Bearbeiten von Diensten erhalten.
+                    Gilt für den gesamten Wochenplan.
                   </div>
                 </div>
               </div>
@@ -694,7 +996,7 @@
               <div class="form-section">
                 <div class="form-section-title mb-2">Dienst</div>
                 <div class="row g-3">
-                  <div class="col-md-6">
+                  <div class="col-12">
                     <label class="form-label" for="memberName"
                       >Teammitglied</label
                     >
@@ -702,10 +1004,12 @@
                       class="form-control"
                       id="memberName"
                       placeholder="Vor-/Nachname"
+                      list="memberList"
                       required
                     />
+                    <datalist id="memberList"></datalist>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-6">
                     <label class="form-label" for="weekday">Tag</label>
                     <select class="form-select" id="weekday" required>
                       <option value="">Tag auswählen</option>
@@ -716,7 +1020,7 @@
                       <option>Freitag</option>
                     </select>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-6">
                     <label class="form-label" for="entryType"
                       >Eintragstyp</label
                     >
@@ -727,7 +1031,15 @@
                       <option value="Feiertag">Feiertag</option>
                     </select>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-6">
+                    <label class="form-label" for="startTime">Startzeit</label>
+                    <input class="form-control" id="startTime" type="time" />
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label" for="endTime">Endzeit</label>
+                    <input class="form-control" id="endTime" type="time" />
+                  </div>
+                  <div class="col-12">
                     <label class="form-label" for="absenceHours">
                       Tagesarbeitszeit (Std.)
                     </label>
@@ -741,16 +1053,8 @@
                       disabled
                     />
                     <div class="form-text">
-                      Nur bei Urlaub/Krank/Feiertag erforderlich.
+                      Nur bei Urlaub/Krank/Feiertag.
                     </div>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label" for="startTime">Startzeit</label>
-                    <input class="form-control" id="startTime" type="time" />
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label" for="endTime">Endzeit</label>
-                    <input class="form-control" id="endTime" type="time" />
                   </div>
                   <div class="col-12">
                     <label class="form-label" for="location"
@@ -764,12 +1068,12 @@
                   </div>
                 </div>
               </div>
-              <div class="form-section">
-                <div
-                  class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2"
-                >
-                  <div class="form-section-title">Ereignis</div>
-                  <div class="form-check m-0">
+              <details class="form-section form-details">
+                <summary class="form-section-title d-flex align-items-center justify-content-between">
+                  <span>Ereignis (optional)</span>
+                </summary>
+                <div class="mt-3">
+                  <div class="form-check mb-2">
                     <input
                       class="form-check-input"
                       type="checkbox"
@@ -779,26 +1083,35 @@
                       Ereignis hinzufügen
                     </label>
                   </div>
-                </div>
-                <div class="row g-3">
-                  <div class="col-12">
-                    <label class="form-label" for="eventTitle">Ereignis</label>
-                    <input
-                      class="form-control"
-                      id="eventTitle"
-                      placeholder="z. B. Teamtag"
-                      disabled
-                    />
-                    <div class="form-text">
-                      Optional: Start- und Endzeit setzen, wenn das Ereignis
-                      einen festen Slot hat. Fett mit **Text**.
+                  <div class="row g-3">
+                    <div class="col-12">
+                      <label class="form-label" for="eventTitle">Ereignis</label>
+                      <input
+                        class="form-control"
+                        id="eventTitle"
+                        placeholder="z. B. Teamtag"
+                        disabled
+                      />
+                      <div class="form-text">
+                        Optional: Start- und Endzeit setzen für feste Slots. <strong>**Fett**</strong>.
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </details>
               <div class="action-buttons">
-                <button class="btn btn-primary flex-grow-1" type="submit">
-                  Zeiten hinzufügen
+                <div class="form-check mb-2 w-100">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="allDaysToggle"
+                  />
+                  <label class="form-check-label" for="allDaysToggle" style="font-size: 0.85rem;">
+                    Auf alle Tage anwenden
+                  </label>
+                </div>
+                <button class="btn btn-primary flex-grow-1" type="submit" id="submitBtn">
+                  Dienst hinzufügen
                 </button>
                 <button
                   class="btn btn-outline-danger"
@@ -808,57 +1121,19 @@
                 >
                   Eintrag löschen
                 </button>
-                <button
-                  class="btn btn-outline-dark"
-                  type="button"
-                  id="clearBtn"
-                >
-                  Woche leeren
-                </button>
-                <button class="btn btn-outline-dark" type="button" id="pdfBtn">
-                  PDF exportieren
-                </button>
-                <button
-                  class="btn btn-outline-dark"
-                  type="button"
-                  id="csvExportBtn"
-                >
-                  CSV exportieren
-                </button>
-                <button
-                  class="btn btn-outline-dark"
-                  type="button"
-                  id="csvImportBtn"
-                >
-                  CSV importieren
-                </button>
-                <input
-                  class="d-none"
-                  id="csvFileInput"
-                  type="file"
-                  accept=".csv,text/csv"
-                />
-                <div class="w-100"></div>
-                <div class="input-group mt-2">
-                  <span class="input-group-text">Dateiname</span>
-                  <input
-                    class="form-control"
-                    id="exportFilename"
-                    placeholder="Woche"
-                  />
-                </div>
               </div>
             </form>
           </div>
         </div>
-        <div class="col-lg-7">
+        <div class="col-lg-8">
           <div class="table-card h-100">
             <div class="table-responsive">
               <table class="table schedule-table" id="scheduleTable">
                 <thead>
                   <tr>
                     <th>Mitarbeiter</th>
-                    <th class="stand-vz-col">Stand VZ</th>
+                    <!-- Stand VZ: intentionally left empty — placeholder for contracted weekly hours (Vollzeit-Äquivalent), populated externally -->
+                    <th class="stand-vz-col" title="Verfügbare Arbeitszeit pro Woche (Vollzeit-Äquivalent)">Stand VZ</th>
                     <th data-day="Montag">
                       <span class="day-label">Montag</span>
                       <span class="day-date d-none"></span>
@@ -884,6 +1159,11 @@
                 </thead>
                 <tbody id="scheduleBody"></tbody>
               </table>
+            </div>
+            <div class="table-empty-state" id="emptyState">
+              <div class="table-empty-icon">＋</div>
+              <div class="table-empty-title">Noch keine Einträge</div>
+              <div class="table-empty-hint">Füge links einen Dienst hinzu oder klicke auf eine Zelle, um zu starten.</div>
             </div>
           </div>
         </div>
@@ -913,10 +1193,13 @@
       const eventTitleInput = document.getElementById("eventTitle");
       const clearBtn = document.getElementById("clearBtn");
       const deleteBtn = document.getElementById("deleteBtn");
+      const submitBtn = document.getElementById("submitBtn");
+      const allDaysToggle = document.getElementById("allDaysToggle");
       const pdfBtn = document.getElementById("pdfBtn");
       const csvExportBtn = document.getElementById("csvExportBtn");
       const csvImportBtn = document.getElementById("csvImportBtn");
       const csvFileInput = document.getElementById("csvFileInput");
+      const saveBtn = document.getElementById("saveBtn");
       const exportFilenameInput = document.getElementById("exportFilename");
       const scheduleBody = document.getElementById("scheduleBody");
       const legendContent = document.getElementById("legendContent");
@@ -940,6 +1223,30 @@
       }, {});
       const eventEditState = { day: null, index: null };
       const entryEditState = { member: null, day: null, index: null };
+      let activeCell = null;
+      let lastSubmittedFlash = { member: null, days: [] };
+
+      function setActiveCell(cell) {
+        if (cell && activeCell === cell) {
+          cell.classList.remove("cell-active");
+          activeCell = null;
+          return;
+        }
+        if (activeCell && activeCell !== cell) {
+          activeCell.classList.remove("cell-active");
+        }
+        if (cell) {
+          cell.classList.add("cell-active");
+        }
+        activeCell = cell;
+      }
+
+      function clearActiveCell() {
+        if (activeCell) {
+          activeCell.classList.remove("cell-active");
+        }
+        activeCell = null;
+      }
 
       function parseTimeToMinutes(value) {
         if (!value) {
@@ -1314,8 +1621,9 @@
       }
 
       function resetEntryFormFields() {
+        const savedMember = memberInput.value;
         scheduleForm.reset();
-        memberInput.value = "";
+        memberInput.value = savedMember;
         weekdaySelect.value = "";
         startTimeInput.value = "";
         endTimeInput.value = "";
@@ -1324,7 +1632,18 @@
         entryTypeSelect.value = "Dienst";
         absenceHoursInput.value = "7,8";
         allDayEventToggle.checked = false;
+        allDaysToggle.checked = false;
+        allDaysToggle.disabled = false;
         toggleEventMode(false);
+      }
+
+      function updateMemberDatalist() {
+        const datalist = document.getElementById("memberList");
+        if (!datalist) return;
+        const members = Object.keys(schedule);
+        datalist.innerHTML = members
+          .map((m) => `<option value="${escapeHtml(m)}"></option>`)
+          .join("");
       }
 
       function escapeCsvValue(value, delimiter) {
@@ -1581,11 +1900,21 @@
           });
 
           const totalCell = document.createElement("td");
-          totalCell.className = "fw-semibold";
-          totalCell.textContent =
-            memberEligible && memberMinutes > 0
-              ? formatHours(memberMinutes)
-              : "—";
+          totalCell.className = "fw-semibold total-cell";
+          if (memberEligible && memberMinutes > 0) {
+            totalCell.textContent = formatHours(memberMinutes);
+            const targetMinutes = 39 * 60;
+            const tolerance = 30;
+            if (memberMinutes < targetMinutes - tolerance) {
+              totalCell.classList.add("total-under");
+            } else if (memberMinutes > targetMinutes + tolerance) {
+              totalCell.classList.add("total-over");
+            } else {
+              totalCell.classList.add("total-ok");
+            }
+          } else {
+            totalCell.textContent = "—";
+          }
           row.appendChild(totalCell);
 
           scheduleBody.appendChild(row);
@@ -1694,10 +2023,22 @@
         }
       }
 
+      function updateSubmitButtonText() {
+        if (!submitBtn) return;
+        if (allDayEventToggle.checked) {
+          submitBtn.textContent = "Ereignis hinzufügen";
+          return;
+        }
+        const entryType = entryTypeSelect.value;
+        submitBtn.textContent = `${entryType} hinzufügen`;
+      }
+
       function toggleEventMode(isEvent) {
         memberInput.disabled = isEvent;
         eventTitleInput.disabled = !isEvent;
+        allDaysToggle.disabled = isEvent;
         if (isEvent) {
+          allDaysToggle.checked = false;
           eventTitleInput.setAttribute("required", "required");
           memberInput.removeAttribute("required");
           startTimeInput.removeAttribute("required");
@@ -1708,6 +2049,25 @@
         }
         updateEntryTypeMode();
         updateDeleteButtonState();
+        updateSubmitButtonText();
+      }
+
+      function flashSubmittedCells() {
+        if (!lastSubmittedFlash.member || lastSubmittedFlash.days.length === 0) {
+          return;
+        }
+        requestAnimationFrame(() => {
+          lastSubmittedFlash.days.forEach((day) => {
+            const cell = document.querySelector(
+              `#scheduleBody tr[data-member="${CSS.escape(lastSubmittedFlash.member)}"] td[data-day="${day}"]`,
+            );
+            if (cell) {
+              cell.classList.remove("cell-flash");
+              void cell.offsetWidth;
+              cell.classList.add("cell-flash");
+            }
+          });
+        });
       }
 
       scheduleForm.addEventListener("submit", (event) => {
@@ -1721,10 +2081,26 @@
         const absenceMinutes = parseHoursToMinutes(absenceHoursInput.value);
         const eventTitle = eventTitleInput.value.trim();
         const isAllDayEvent = allDayEventToggle.checked;
+        const applyAllDays = allDaysToggle.checked && !isAllDayEvent && entryEditState.index === null;
 
-        if (!day) {
+        if (!day && !applyAllDays) {
           return;
         }
+
+        if (
+          !isAllDayEvent &&
+          !absenceTypes.has(entryType) &&
+          startTime &&
+          endTime
+        ) {
+          const startMin = parseTimeToMinutes(startTime);
+          const endMin = parseTimeToMinutes(endTime);
+          if (endMin < startMin) {
+            return;
+          }
+        }
+
+        const targetDays = applyAllDays ? weekDays : [day];
 
         if (isAllDayEvent) {
           if (!eventTitle) {
@@ -1745,42 +2121,59 @@
           if (!member) {
             return;
           }
-          if (absenceTypes.has(entryType)) {
-            const resolvedAbsenceMinutes =
-              absenceMinutes || DEFAULT_FULL_DAY_MINUTES;
-            addEntry({
-              member,
-              day,
-              startTime: "",
-              endTime: "",
-              location: "",
-              entryType,
-              absenceMinutes: resolvedAbsenceMinutes,
-            });
-          } else {
-            const hasStart = Boolean(startTime);
-            const hasEnd = Boolean(endTime);
-            if (hasStart !== hasEnd) {
-              return;
+          targetDays.forEach((targetDay) => {
+            if (absenceTypes.has(entryType)) {
+              const resolvedAbsenceMinutes =
+                absenceMinutes || DEFAULT_FULL_DAY_MINUTES;
+              addEntry({
+                member,
+                day: targetDay,
+                startTime: "",
+                endTime: "",
+                location: "",
+                entryType,
+                absenceMinutes: resolvedAbsenceMinutes,
+              });
+            } else {
+              const hasStart = Boolean(startTime);
+              const hasEnd = Boolean(endTime);
+              if (hasStart !== hasEnd) {
+                return;
+              }
+              addEntry({
+                member,
+                day: targetDay,
+                startTime,
+                endTime,
+                location,
+                entryType,
+              });
             }
-            addEntry({
-              member,
-              day,
-              startTime,
-              endTime,
-              location,
-              entryType,
-            });
-          }
+          });
         }
+
+        lastSubmittedFlash = {
+          member: isAllDayEvent ? null : member,
+          days: isAllDayEvent ? [] : targetDays.slice(),
+        };
+
         resetEntryFormFields();
-        resetEventEditState();
         resetEntryEditState();
+        resetEventEditState();
         updateDeleteButtonState();
+        clearActiveCell();
         renderTable();
+        updateMemberDatalist();
+        flashSubmittedCells();
       });
 
       clearBtn.addEventListener("click", () => {
+        const hasData =
+          Object.keys(schedule).length > 0 ||
+          weekDays.some((day) => allDayEvents[day].length > 0);
+        if (hasData && !confirm("Möchtest du wirklich die gesamte Woche leeren?")) {
+          return;
+        }
         Object.keys(schedule).forEach((member) => {
           delete schedule[member];
         });
@@ -1791,7 +2184,9 @@
         resetEntryEditState();
         resetEventEditState();
         updateDeleteButtonState();
+        clearActiveCell();
         renderTable();
+        updateMemberDatalist();
       });
 
       deleteBtn.addEventListener("click", () => {
@@ -1863,7 +2258,7 @@
         });
       });
 
-      csvExportBtn.addEventListener("click", () => {
+      function generateCsvContent() {
         const delimiter = ";";
         const header = [
           "Typ",
@@ -1916,8 +2311,7 @@
               netMinutes,
               hasBreak,
               breakDeductionEntries,
-            } =
-              calculateDayTotals(entry);
+            } = calculateDayTotals(entry);
             entry.forEach((segment) => {
               if (isAbsenceEntry(segment)) {
                 const absenceMinutes =
@@ -1961,13 +2355,30 @@
           });
         });
 
-        const csvContent = rows
+        return rows
           .map((row) =>
             row
               .map((value) => escapeCsvValue(value, delimiter))
               .join(delimiter),
           )
           .join("\n");
+      }
+
+      csvExportBtn.addEventListener("click", () => {
+        const csvContent = generateCsvContent();
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = getExportFilename(".csv");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      });
+
+      saveBtn.addEventListener("click", () => {
+        const csvContent = generateCsvContent();
         const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -1984,10 +2395,11 @@
         csvFileInput.click();
       });
 
-      csvFileInput.addEventListener("change", (event) => {
-        const file = event.target.files && event.target.files[0];
-        if (!file) {
-          return;
+      function processImportedFile(file) {
+        if (!file) return;
+        const fileName = file.name ? file.name.replace(/\.csv$/i, "") : "";
+        if (fileName) {
+          exportFilenameInput.value = fileName;
         }
 
         const reader = new FileReader();
@@ -2136,6 +2548,13 @@
           syncLegendPrintState();
         };
         reader.readAsText(file, "utf-8");
+      }
+
+      csvFileInput.addEventListener("change", (event) => {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        saveBtn.disabled = false;
+        processImportedFile(file);
       });
 
       scheduleBody.addEventListener("click", (event) => {
@@ -2144,13 +2563,30 @@
           return;
         }
 
+        setActiveCell(cell);
         const row = cell.parentElement;
+        const wasAlreadyActive = activeCell === null && cell.classList.contains("cell-active") === false;
+
         if (row.getAttribute("data-row-type") === "events") {
           const day = cell.getAttribute("data-day");
           const eventItem = event.target.closest("[data-event-index]");
           if (!day) {
             return;
           }
+
+          // If clicking the same events cell that was active, switch back to shift mode
+          if (!cell.classList.contains("cell-active") && allDayEventToggle.checked) {
+            allDayEventToggle.checked = false;
+            toggleEventMode(false);
+            resetEventEditState();
+            eventTitleInput.value = "";
+            startTimeInput.value = "";
+            endTimeInput.value = "";
+            weekdaySelect.value = "";
+            updateDeleteButtonState();
+            return;
+          }
+
           allDayEventToggle.checked = true;
           toggleEventMode(true);
           resetEntryEditState();
@@ -2202,6 +2638,8 @@
             entryEditState.member = member;
             entryEditState.day = day;
             entryEditState.index = Number.isNaN(index) ? null : index;
+            allDaysToggle.disabled = true;
+            allDaysToggle.checked = false;
             updateEntryTypeMode();
           }
         } else {
@@ -2210,6 +2648,7 @@
           locationInput.value = "";
           entryTypeSelect.value = "Dienst";
           absenceHoursInput.value = "7,8";
+          allDaysToggle.disabled = false;
           resetEntryEditState();
           updateEntryTypeMode();
         }
@@ -2225,8 +2664,43 @@
         updateWeekdayHeaders(weekInput.value);
       });
 
+      function getIsoWeeksInYear(year) {
+        const jan1 = new Date(year, 0, 1);
+        const dec31 = new Date(year, 11, 31);
+        const jan1Day = jan1.getDay() || 7;
+        const dec31Day = dec31.getDay() || 7;
+        if (jan1Day <= 4 && dec31Day <= 4) return 53;
+        if (jan1Day <= 4 || dec31Day <= 4) return 53;
+        return 52;
+      }
+
+      function shiftWeek(delta) {
+        const parsed = parseWeekValue(weekInput.value);
+        if (!parsed) {
+          return;
+        }
+        let newWeek = parsed.week + delta;
+        let newYear = parsed.year;
+        if (newWeek < 1) {
+          newYear -= 1;
+          newWeek = getIsoWeeksInYear(newYear);
+        } else if (newWeek > getIsoWeeksInYear(newYear)) {
+          newYear += 1;
+          newWeek = 1;
+        }
+        const weekStr = String(newWeek).padStart(2, "0");
+        weekInput.value = `${newYear}-W${weekStr}`;
+        updateWeekdayHeaders(weekInput.value);
+      }
+
+      const weekPrevBtn = document.getElementById("weekPrevBtn");
+      const weekNextBtn = document.getElementById("weekNextBtn");
+      weekPrevBtn.addEventListener("click", () => shiftWeek(-1));
+      weekNextBtn.addEventListener("click", () => shiftWeek(1));
+
       allDayEventToggle.addEventListener("change", () => {
         toggleEventMode(allDayEventToggle.checked);
+        updateSubmitButtonText();
         if (allDayEventToggle.checked) {
           resetEntryEditState();
         }
@@ -2241,6 +2715,7 @@
 
       entryTypeSelect.addEventListener("change", () => {
         updateEntryTypeMode();
+        updateSubmitButtonText();
         if (absenceTypes.has(entryTypeSelect.value)) {
           startTimeInput.value = "";
           endTimeInput.value = "";
@@ -2251,12 +2726,79 @@
         }
       });
 
+      function formatTimeFromMinutes(totalMinutes) {
+        const h = Math.floor(totalMinutes / 60) % 24;
+        const m = totalMinutes % 60;
+        return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+      }
+
+      function validateTimeRange() {
+        const start = startTimeInput.value;
+        const end = endTimeInput.value;
+        if (start && end) {
+          const startMin = parseTimeToMinutes(start);
+          const endMin = parseTimeToMinutes(end);
+          if (endMin < startMin) {
+            endTimeInput.classList.add("is-invalid");
+            return false;
+          }
+        }
+        endTimeInput.classList.remove("is-invalid");
+        return true;
+      }
+
+      startTimeInput.addEventListener("input", validateTimeRange);
+      endTimeInput.addEventListener("input", validateTimeRange);
+
+      startTimeInput.addEventListener("change", () => {
+        if (!startTimeInput.value || endTimeInput.value) {
+          return;
+        }
+        if (absenceTypes.has(entryTypeSelect.value) || allDayEventToggle.checked) {
+          return;
+        }
+        const start = parseTimeToMinutes(startTimeInput.value);
+        if (start === null) return;
+        const defaultNetHours = 7.8;
+        const breakMinutes = 30;
+        const endMinutes = Math.round(start + defaultNetHours * 60 + breakMinutes);
+        endTimeInput.value = formatTimeFromMinutes(endMinutes);
+      });
+
+      document.addEventListener("keydown", (event) => {
+        const isFormElement =
+          event.target.tagName === "INPUT" ||
+          event.target.tagName === "SELECT" ||
+          event.target.tagName === "TEXTAREA" ||
+          event.target.isContentEditable;
+
+        if (event.key === "Escape" && !isFormElement) {
+          resetEntryFormFields();
+          resetEntryEditState();
+          resetEventEditState();
+          updateDeleteButtonState();
+          clearActiveCell();
+          return;
+        }
+
+        if (
+          (event.ctrlKey || event.metaKey) &&
+          event.key === "Backspace" &&
+          !isFormElement
+        ) {
+          event.preventDefault();
+          clearBtn.click();
+          return;
+        }
+      });
+
       legendContent.addEventListener("input", () => {
         syncLegendPrintState();
       });
 
       updateWeekdayHeaders(weekInput.value);
       toggleEventMode(false);
+      updateSubmitButtonText();
       syncLegendPrintState();
       renderTable();
     </script>
