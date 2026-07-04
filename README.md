@@ -9,7 +9,7 @@ Die Daten verbleiben lokal im Browser und werden nicht an einen Server gesendet.
 - **Eintragstypen**: Dienst (mit Start-/Endzeit), Urlaub, Krank, Feiertag
 - **Pausenregel**: automatische 30-min Abzug bei über 6 Stunden
 - **Ereignisse**: ganztägige oder zeitgebundene Ereignisse pro Tag
-- **Stundensumme** pro Mitarbeiter mit Farbindikator (grün/amber/rot vs. 39h-Ziel)
+- **Stundensumme** pro Mitarbeiter
 - **Woche-Navigation**: Vor/Zurück-Buttons + Kalenderwochen-Auswahl
 - **Smart Endzeit**: automatisch Start + 7,8h + 30min Pause beim Setzen der Startzeit
 - **Member-Autocomplete**: bereits eingegebene Namen erscheinen als Vorschlag
@@ -64,18 +64,18 @@ Die App verwendet ein IIFE-Modul-Pattern mit gemeinsamem Namespace
 
 ### Module
 
-| Modul       | Datei             | Verantwortung                                      |
-|-------------|-------------------|---------------------------------------------------|
-| `D.Time`       | `js/time.js`        | `parseTimeToMinutes`, `calculateDurationMinutes`, `formatHours`, `formatHoursDecimal`, `formatHoursDecimalInput`, `formatTimeFromMinutes` |
-| `D.BreakRules` | `js/break-rules.js`| `DEFAULT_FULL_DAY_MINUTES`, `absenceTypes`, `getEntryWindowMinutes`, `applyBreakRule`, `calculateDayTotals`, `isAbsenceEntry`, `isTimedEntry` |
-| `D.Csv`        | `js/csv.js`         | `generateCsvContent`, `parseCsvText`, `parseCsvLine`, `escapeCsvValue`, `escapeHtml`, `formatEventTitle` |
-| `D.Week`       | `js/week.js`        | `parseWeekValue`, `getIsoWeekStartDate`, `formatDate`, `updateWeekdayHeaders`, `getIsoWeeksInYear`, `shiftWeek`, `weekDays` |
-| `D.Export`     | `js/export.js`      | `getExportFilename`, `getExportBaseName`, `getPixelsPerMillimeter`, `preparePdfExport`, `syncLegendPrintState` |
-| `D.State`      | `js/state.js`       | `schedule`, `allDayEvents`, `eventEditState`, `entryEditState`, `addEntry`, `addAllDayEvent`, `setActiveCell`, `clearActiveCell`, `parseHoursToMinutes` |
+| Modul          | Datei               | Verantwortung                                                                                                                                                       |
+| -------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `D.Time`       | `js/time.js`        | `parseTimeToMinutes`, `calculateDurationMinutes`, `formatHours`, `formatHoursDecimal`, `formatHoursDecimalInput`, `formatTimeFromMinutes`                           |
+| `D.BreakRules` | `js/break-rules.js` | `DEFAULT_FULL_DAY_MINUTES`, `absenceTypes`, `getEntryWindowMinutes`, `applyBreakRule`, `calculateDayTotals`, `isAbsenceEntry`, `isTimedEntry`                       |
+| `D.Csv`        | `js/csv.js`         | `generateCsvContent`, `parseCsvText`, `parseCsvLine`, `escapeCsvValue`, `escapeHtml`, `formatEventTitle`                                                            |
+| `D.Week`       | `js/week.js`        | `parseWeekValue`, `getIsoWeekStartDate`, `formatDate`, `updateWeekdayHeaders`, `getIsoWeeksInYear`, `shiftWeek`, `weekDays`                                         |
+| `D.Export`     | `js/export.js`      | `getExportFilename`, `getExportBaseName`, `getPixelsPerMillimeter`, `preparePdfExport`, `syncLegendPrintState`                                                      |
+| `D.State`      | `js/state.js`       | `schedule`, `allDayEvents`, `eventEditState`, `entryEditState`, `addEntry`, `addAllDayEvent`, `setActiveCell`, `clearActiveCell`, `parseHoursToMinutes`             |
 | `D.Form`       | `js/form.js`        | `resetFormExceptMember`, `updateMemberDatalist`, `updateDeleteButtonState`, `updateEntryTypeMode`, `updateSubmitButtonText`, `toggleEventMode`, `validateTimeRange` |
-| `D.Render`     | `js/render.js`      | `renderTable` (mit `renderEventsRow`, `renderMemberRow`, `renderEntryCell`), `flashSubmittedCells` |
-| `D.Import`     | `js/import.js`      | `processImportedFile` |
-| Einstiegspunkt | `js/app.js`         | DOM-Referenzen, alle Event-Listener, Tastatur-Shortcuts, Initialisierung |
+| `D.Render`     | `js/render.js`      | `renderTable` (mit `renderEventsRow`, `renderMemberRow`, `renderEntryCell`), `flashSubmittedCells`                                                                  |
+| `D.Import`     | `js/import.js`      | `processImportedFile`                                                                                                                                               |
+| Einstiegspunkt | `js/app.js`         | DOM-Referenzen, alle Event-Listener, Tastatur-Shortcuts, Initialisierung                                                                                            |
 
 ### Abhängigkeiten
 
