@@ -78,6 +78,25 @@
     Form.updateDeleteButtonState(deleteBtn, State.entryEditState, State.eventEditState);
   }
 
+  function clearSelectionForm() {
+    scheduleForm.reset();
+    memberInput.value = "";
+    weekdaySelect.value = "";
+    startTimeInput.value = "";
+    endTimeInput.value = "";
+    locationInput.value = "";
+    eventTitleInput.value = "";
+    entryTypeSelect.value = "Dienst";
+    absenceHoursInput.value = "7,8";
+    allDayEventToggle.checked = false;
+    allDaysToggle.checked = false;
+    allDaysToggle.disabled = false;
+    State.resetEntryEditState();
+    State.resetEventEditState();
+    Form.toggleEventMode(false, els);
+    updateDeleteBtn();
+  }
+
   function hasPendingEditSelection() {
     const hasEntrySelection =
       State.entryEditState.member !== null &&
@@ -410,13 +429,42 @@
       return;
     }
 
-    State.setActiveCell(cell);
+    const entryIndexElement = event.target.closest("[data-entry-index]");
+    const eventItem = event.target.closest("[data-event-index]");
+    const addEntryButton = event.target.closest("[data-add-entry]");
+    const entryIndex = entryIndexElement
+      ? Number(entryIndexElement.getAttribute("data-entry-index"))
+      : null;
+    const eventIndex = eventItem
+      ? Number(eventItem.getAttribute("data-event-index"))
+      : null;
+    const isCurrentEntryClick =
+      entryIndex !== null &&
+      State.entryEditState.day === cell.getAttribute("data-day") &&
+      State.entryEditState.index === entryIndex &&
+      State.entryEditState.member === cell.parentElement.getAttribute("data-member");
+    const isCurrentEventClick =
+      eventIndex !== null &&
+      State.eventEditState.day === cell.getAttribute("data-day") &&
+      State.eventEditState.index === eventIndex;
+    const shouldDeselectCell =
+      State.activeCell === cell &&
+      ((!entryIndexElement && !eventItem && !addEntryButton) ||
+        isCurrentEntryClick ||
+        isCurrentEventClick);
+    if (shouldDeselectCell) {
+      State.clearActiveCell();
+      clearSelectionForm();
+      return;
+    }
+
+    if (State.activeCell !== cell) {
+      State.setActiveCell(cell);
+    }
     const row = cell.parentElement;
-    const wasAlreadyActive = State.activeCell === null && cell.classList.contains("cell-active") === false;
 
     if (row.getAttribute("data-row-type") === "events") {
       const day = cell.getAttribute("data-day");
-      const eventItem = event.target.closest("[data-event-index]");
       if (!day) {
         return;
       }
@@ -460,7 +508,6 @@
 
     const member = row.getAttribute("data-member");
     const day = cell.getAttribute("data-day");
-    const entryIndexElement = event.target.closest("[data-entry-index]");
     const entries = State.schedule[member] && State.schedule[member][day];
     allDayEventToggle.checked = false;
     Form.toggleEventMode(false, els);
@@ -470,9 +517,9 @@
     weekdaySelect.value = day;
     const selectedEntryIndex = entryIndexElement
       ? Number(entryIndexElement.getAttribute("data-entry-index"))
-      : entries && entries.length === 1
-        ? 0
-        : null;
+      : null;
+    const hasEntries = entries && entries.length > 0;
+    const shouldPrepareNewEntry = Boolean(addEntryButton) || !hasEntries;
     if (entries && selectedEntryIndex !== null) {
       const index = selectedEntryIndex;
       const entry = entries[index];
@@ -491,7 +538,7 @@
         allDaysToggle.checked = false;
         Form.updateEntryTypeMode(els);
       }
-    } else {
+    } else if (shouldPrepareNewEntry) {
       startTimeInput.value = "";
       endTimeInput.value = "";
       locationInput.value = "";
@@ -500,6 +547,9 @@
       allDaysToggle.disabled = false;
       State.resetEntryEditState();
       Form.updateEntryTypeMode(els);
+    } else {
+      clearSelectionForm();
+      return;
     }
     updateDeleteBtn();
     if (absenceTypes.has(entryTypeSelect.value)) {

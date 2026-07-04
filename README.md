@@ -7,8 +7,9 @@ Die Daten verbleiben lokal im Browser und werden nicht an einen Server gesendet.
 
 - **Dienstplan-Tabelle** mit Mitarbeiterzeilen und Tagesspalten (Mo–Fr)
 - **Eintragstypen**: Dienst (mit Start-/Endzeit), Urlaub, Krank, Feiertag
+- **Mehrere Dienste pro Tag**: bestehende Dienstzeilen anklicken zum Bearbeiten, `+ Weiterer Dienst` in der Zelle zum Hinzufügen
 - **Pausenregel**: automatische 30-min Abzug bei über 6 Stunden
-- **Ereignisse**: ganztägige oder zeitgebundene Ereignisse pro Tag
+- **Ereignisse**: ganztägige oder zeitgebundene, mehrzeilige Ereignisse pro Tag
 - **Stundensumme** pro Mitarbeiter
 - **Woche-Navigation**: Vor/Zurück-Buttons + Kalenderwochen-Auswahl
 - **Smart Endzeit**: automatisch Start + 7,8h + 30min Pause beim Setzen der Startzeit

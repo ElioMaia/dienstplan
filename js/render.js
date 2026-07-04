@@ -73,7 +73,7 @@
 
     entries.forEach((entry, index) => {
       const line = document.createElement("div");
-      line.className = "d-flex align-items-center flex-wrap";
+      line.className = "entry-line d-flex align-items-center flex-wrap";
       line.setAttribute("data-entry-index", String(index));
 
       if (isAbsenceEntry(entry)) {
@@ -137,6 +137,17 @@
         cell.appendChild(breakNote);
       }
     });
+
+    if (entries.some((entry) => !isAbsenceEntry(entry))) {
+      const addButton = document.createElement("button");
+      addButton.type = "button";
+      addButton.className = "entry-add-btn";
+      addButton.textContent = "+ Weiterer Dienst";
+      addButton.setAttribute("aria-label", "Weiteren Dienst hinzufügen");
+      addButton.setAttribute("title", "Weiteren Dienst hinzufügen");
+      addButton.setAttribute("data-add-entry", "true");
+      cell.appendChild(addButton);
+    }
   }
 
   function renderMemberRow(scheduleBody, schedule, member) {

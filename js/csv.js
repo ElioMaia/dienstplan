@@ -12,7 +12,9 @@
 
   function formatEventTitle(value) {
     const escaped = escapeHtml(value);
-    return escaped.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    return escaped
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\r?\n/g, "<br>");
   }
 
   function escapeCsvValue(value, delimiter) {
@@ -65,17 +67,63 @@
   }
 
   function parseCsvText(text) {
-    const lines = text
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0);
+    const normalizedText = String(text || "").replace(/^\uFEFF/, "");
+    const firstLine = normalizedText.split(/\r?\n/, 1)[0] || "";
+    const delimiter = firstLine.includes(";") ? ";" : ",";
+    const rows = [];
+    let row = [];
+    let current = "";
+    let inQuotes = false;
 
-    if (!lines.length) {
-      return [];
+    for (let i = 0; i < normalizedText.length; i += 1) {
+      const char = normalizedText[i];
+      const nextChar = normalizedText[i + 1];
+
+      if (char === '"' && inQuotes && nextChar === '"') {
+        current += '"';
+        i += 1;
+        continue;
+      }
+
+      if (char === '"') {
+        inQuotes = !inQuotes;
+        continue;
+      }
+
+      if (char === delimiter && !inQuotes) {
+        row.push(current.trim());
+        current = "";
+        continue;
+      }
+
+      if ((char === "\n" || char === "\r") && !inQuotes) {
+        row.push(current.trim());
+        if (row.some((value) => value.length > 0)) {
+          rows.push(row);
+        }
+        row = [];
+        current = "";
+        if (char === "\r" && nextChar === "\n") {
+          i += 1;
+        }
+        continue;
+      }
+
+      if ((char === "\n" || char === "\r") && inQuotes) {
+        current += "\n";
+        if (char === "\r" && nextChar === "\n") {
+          i += 1;
+        }
+        continue;
+      }
+
+      current += char;
     }
 
-    const delimiter = lines[0].includes(";") ? ";" : ",";
-    const rows = lines.map((line) => parseCsvLine(line, delimiter));
+    row.push(current.trim());
+    if (row.some((value) => value.length > 0)) {
+      rows.push(row);
+    }
 
     return { delimiter, rows };
   }
