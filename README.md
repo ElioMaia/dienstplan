@@ -47,7 +47,7 @@ dienstplan/
 
 ## Architektur
 
-Die App verwendet ein IIFE-Modul-Pattern mit gemeinsamem Namespace
+Die Anwendung verwendet ein IIFE-Modul-Pattern mit gemeinsamem Namespace
 `window.Dienstplan`. Jede Datei ist ein sofort-ausgeführter Funktionsausdruck
 (IIFE), der seine API an den Namespace exportiert.
 
