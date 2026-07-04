@@ -68,6 +68,7 @@
 
   const State = D.State;
   const Form = D.Form;
+  let importedFileHandle = null;
 
   function resetForm() {
     Form.resetFormExceptMember(els);
@@ -75,6 +76,40 @@
 
   function updateDeleteBtn() {
     Form.updateDeleteButtonState(deleteBtn, State.entryEditState, State.eventEditState);
+  }
+
+  function hasPendingEditSelection() {
+    const hasEntrySelection =
+      State.entryEditState.member !== null &&
+      State.entryEditState.day !== null &&
+      State.entryEditState.index !== null;
+    const hasEventSelection =
+      State.eventEditState.day !== null && State.eventEditState.index !== null;
+    return hasEntrySelection || hasEventSelection;
+  }
+
+  function commitPendingEditSelection() {
+    if (!hasPendingEditSelection()) {
+      return true;
+    }
+    if (!scheduleForm.reportValidity()) {
+      return false;
+    }
+    if (typeof scheduleForm.requestSubmit === "function") {
+      scheduleForm.requestSubmit(submitBtn);
+    } else {
+      submitBtn.click();
+    }
+    return !hasPendingEditSelection();
+  }
+
+  function generateCurrentCsvContent() {
+    return D.Csv.generateCsvContent({
+      weekInput,
+      legendContent,
+      schedule: State.schedule,
+      allDayEvents: State.allDayEvents,
+    });
   }
 
   scheduleForm.addEventListener("submit", (event) => {
@@ -266,12 +301,10 @@
   });
 
   csvExportBtn.addEventListener("click", () => {
-    const csvContent = D.Csv.generateCsvContent({
-      weekInput,
-      legendContent,
-      schedule: State.schedule,
-      allDayEvents: State.allDayEvents,
-    });
+    if (!commitPendingEditSelection()) {
+      return;
+    }
+    const csvContent = generateCurrentCsvContent();
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -283,13 +316,39 @@
     URL.revokeObjectURL(url);
   });
 
-  saveBtn.addEventListener("click", () => {
-    const csvContent = D.Csv.generateCsvContent({
-      weekInput,
-      legendContent,
-      schedule: State.schedule,
-      allDayEvents: State.allDayEvents,
-    });
+  saveBtn.addEventListener("click", async () => {
+    if (!commitPendingEditSelection()) {
+      return;
+    }
+    const csvContent = generateCurrentCsvContent();
+    if (importedFileHandle) {
+      try {
+        const writable = await importedFileHandle.createWritable();
+        await writable.write(csvContent);
+        await writable.close();
+        return;
+      } catch (err) {
+        importedFileHandle = null;
+      }
+    }
+
+    if (window.showSaveFilePicker) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: D.Export.getExportFilename(".csv", exportFilenameInput),
+          types: [{ description: "CSV", accept: { "text/csv": [".csv"] } }],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(csvContent);
+        await writable.close();
+        return;
+      } catch (err) {
+        if (err.name === "AbortError") return;
+        // SecurityError or other — fall through to download
+      }
+    }
+
+    // Fallback: download as file
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -302,6 +361,31 @@
   });
 
   csvImportBtn.addEventListener("click", () => {
+    if (window.showOpenFilePicker) {
+      (async () => {
+        try {
+          const [handle] = await window.showOpenFilePicker({
+            multiple: false,
+            types: [{ description: "CSV", accept: { "text/csv": [".csv"] } }],
+          });
+          const file = await handle.getFile();
+          importedFileHandle = handle;
+          saveBtn.disabled = false;
+          D.Import.processImportedFile(file, {
+            exportFilenameInput,
+            weekInput,
+            weekdayHeaders,
+            legendContent,
+            scheduleBody,
+          });
+        } catch (err) {
+          if (err.name !== "AbortError") {
+            importedFileHandle = null;
+          }
+        }
+      })();
+      return;
+    }
     csvFileInput.value = "";
     csvFileInput.click();
   });
@@ -309,6 +393,7 @@
   csvFileInput.addEventListener("change", (event) => {
     const file = event.target.files && event.target.files[0];
     if (!file) return;
+    importedFileHandle = null;
     saveBtn.disabled = false;
     D.Import.processImportedFile(file, {
       exportFilenameInput,
@@ -383,10 +468,13 @@
     State.resetEntryEditState();
     memberInput.value = member;
     weekdaySelect.value = day;
-    if (entries && entryIndexElement) {
-      const index = Number(
-        entryIndexElement.getAttribute("data-entry-index"),
-      );
+    const selectedEntryIndex = entryIndexElement
+      ? Number(entryIndexElement.getAttribute("data-entry-index"))
+      : entries && entries.length === 1
+        ? 0
+        : null;
+    if (entries && selectedEntryIndex !== null) {
+      const index = selectedEntryIndex;
       const entry = entries[index];
       if (entry) {
         entryTypeSelect.value = entry.type || "Dienst";

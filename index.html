@@ -40,56 +40,6 @@
         min-height: 100vh;
       }
 
-      .hero {
-        padding: 28px 0 14px;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .hero::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background:
-          radial-gradient(
-            circle at 80% 0%,
-            rgba(10, 79, 110, 0.25) 0%,
-            transparent 50%
-          ),
-          radial-gradient(
-            circle at 0% 100%,
-            rgba(227, 108, 91, 0.2) 0%,
-            transparent 55%
-          );
-        z-index: 0;
-      }
-
-      .hero-content {
-        position: relative;
-        z-index: 1;
-      }
-
-      .badge-pill {
-        background: var(--night);
-        color: #f8f1e5;
-        letter-spacing: 0.08em;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        padding: 0.25rem 0.65rem;
-        border-radius: 999px;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-      }
-
-      .badge-pill span {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--sun);
-      }
-
       .panel {
         background: rgba(255, 255, 255, 0.8);
         border-radius: 20px;
@@ -473,7 +423,125 @@
         color: var(--muted);
       }
 
-      /* ===== Buttons & Toolbar ===== */
+      /* ===== Toolbar (desktop-style, full-width) ===== */
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        padding: 0 16px;
+        height: 48px;
+        background: var(--night);
+        color: #f8f1e5;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 12px rgba(14, 18, 41, 0.18);
+        margin-bottom: 20px;
+      }
+
+      .toolbar-brand {
+        font-size: 0.9rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: #f8f1e5;
+        margin-right: 8px;
+        user-select: none;
+        white-space: nowrap;
+      }
+
+      .toolbar-spacer {
+        flex: 1;
+      }
+
+      .toolbar-divider {
+        width: 1px;
+        height: 20px;
+        background: rgba(248, 241, 229, 0.2);
+        margin: 0 8px;
+        flex-shrink: 0;
+      }
+
+      .btn-tool {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        border: none;
+        background: transparent;
+        color: rgba(248, 241, 229, 0.6);
+        cursor: pointer;
+        transition: all 0.15s ease;
+        position: relative;
+        flex-shrink: 0;
+      }
+
+      .btn-tool:hover {
+        background: rgba(248, 241, 229, 0.12);
+        color: #f8f1e5;
+      }
+
+      .btn-tool:active {
+        background: rgba(248, 241, 229, 0.20);
+      }
+
+      .btn-tool:disabled {
+        opacity: 0.30;
+        cursor: default;
+      }
+
+      .btn-tool:disabled:hover {
+        background: transparent;
+        color: rgba(248, 241, 229, 0.6);
+      }
+
+      .toolbar-icon {
+        width: 19px;
+        height: 19px;
+        flex-shrink: 0;
+      }
+
+      .toolbar-icon-sm {
+        width: 13px;
+        height: 13px;
+        flex-shrink: 0;
+        color: rgba(248, 241, 229, 0.5);
+      }
+
+      .filename-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(248, 241, 229, 0.10);
+        border-radius: 8px;
+        padding: 0 10px;
+        height: 32px;
+        transition: background 0.15s ease;
+      }
+
+      .filename-group:focus-within {
+        background: rgba(248, 241, 229, 0.18);
+      }
+
+      .filename-group .filename-input {
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        outline: none;
+        padding: 0;
+        width: 140px;
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: #f8f1e5;
+        font-family: "IBM Plex Mono", monospace;
+      }
+
+      .filename-group .filename-input::placeholder {
+        color: rgba(248, 241, 229, 0.4);
+      }
+
+      /* ===== Form Buttons ===== */
       .btn-primary {
         background: var(--night);
         border-color: var(--night);
@@ -536,61 +604,6 @@
         flex-basis: 100%;
       }
 
-      .plan-toolbar {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 16px;
-      }
-
-      .plan-toolbar .btn {
-        border-radius: 10px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        padding: 0.42rem 0.85rem;
-      }
-
-      .plan-toolbar .toolbar-spacer {
-        flex: 1;
-      }
-
-      .plan-toolbar .filename-group {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(255, 255, 255, 0.8);
-        border: 1px solid rgba(17, 19, 27, 0.12);
-        border-radius: 10px;
-        padding: 2px 8px 2px 12px;
-        transition: border-color 0.18s ease;
-      }
-
-      .plan-toolbar .filename-group:focus-within {
-        border-color: var(--ocean);
-      }
-
-      .plan-toolbar .filename-group .form-control {
-        border: none;
-        background: transparent;
-        box-shadow: none;
-        padding: 0.4rem 0;
-        width: 130px;
-        font-size: 0.85rem;
-      }
-
-      .plan-toolbar .filename-group .form-control:focus {
-        box-shadow: none;
-      }
-
-      .plan-toolbar .filename-group .input-group-text {
-        background: transparent;
-        border: none;
-        font-size: 0.78rem;
-        color: var(--muted);
-        padding: 0;
-      }
-
       /* ===== Animations ===== */
       .fade-in {
         animation: fadeIn 0.8s ease forwards;
@@ -630,24 +643,27 @@
 
       /* ===== Responsive ===== */
       @media (max-width: 768px) {
-        .hero {
-          padding: 20px 0 10px;
-        }
-
         .panel {
           padding: 16px;
         }
 
-        .plan-toolbar {
-          gap: 6px;
+        .toolbar {
+          padding: 0 8px;
+          height: 44px;
+          overflow-x: auto;
         }
 
-        .plan-toolbar .btn {
-          flex: 1 1 calc(50% - 6px);
+        .toolbar-brand {
+          display: none;
         }
 
-        .plan-toolbar .filename-group {
-          flex: 1 1 100%;
+        .btn-tool {
+          width: 30px;
+          height: 30px;
+        }
+
+        .filename-group .filename-input {
+          width: 90px;
         }
 
         .schedule-table tbody td {
@@ -663,10 +679,9 @@
         print-color-adjust: exact;
       }
 
-      body.pdf-export-mode .hero,
       body.pdf-export-mode .panel,
       body.pdf-export-mode .legend,
-      body.pdf-export-mode .plan-toolbar,
+      body.pdf-export-mode .toolbar,
       body.pdf-export-mode .table-empty-state,
       body.pdf-export-mode form,
       body.pdf-export-mode #pdfBtn,
@@ -802,10 +817,9 @@
           print-color-adjust: exact;
         }
 
-        .hero,
         .panel,
         .legend,
-        .plan-toolbar,
+        .toolbar,
         .table-empty-state,
         form,
         #pdfBtn,
@@ -929,55 +943,32 @@
     </style>
   </head>
   <body>
-    <header class="hero">
-      <div class="container hero-content">
-        <div class="row align-items-center g-4">
-          <div>
-            <div class="badge-pill mb-2"><span></span>Dienstplan Studio</div>
-            <h1 class="h2 fw-bold mb-1">Dienstpläne</h1>
-            <p class="text-muted mb-0" style="font-size: 0.95rem;">
-              Plane ausgewogene Rotationen, sieh die Abdeckung sofort und halte
-              dein Team auf einen Blick synchron. Die Daten bleiben lokal und
-              werden nicht gespeichert.
-            </p>
-          </div>
-        </div>
+    <div class="toolbar" id="toolbar">
+      <div class="toolbar-brand">Dienstplan</div>
+      <div class="toolbar-divider"></div>
+      <button class="btn-tool" type="button" id="clearBtn" title="Woche leeren" aria-label="Woche leeren">
+        <svg class="toolbar-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 6h10M8 6V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2M6 6l1 11a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1l1-11"/></svg>
+      </button>
+      <button class="btn-tool" type="button" id="pdfBtn" title="PDF exportieren" aria-label="PDF exportieren">
+        <svg class="toolbar-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h9l5 5v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M12 2v5h5"/><text x="6" y="16" font-size="6" fill="currentColor" stroke="none" font-weight="700">PDF</text></svg>
+      </button>
+      <button class="btn-tool" type="button" id="csvExportBtn" title="CSV exportieren" aria-label="CSV exportieren">
+        <svg class="toolbar-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h9l5 5v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M12 2v5h5"/><path d="M6 11h8M6 14h8M6 17h5"/></svg>
+      </button>
+      <button class="btn-tool" type="button" id="csvImportBtn" title="CSV importieren" aria-label="CSV importieren">
+        <svg class="toolbar-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h9l5 5v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M12 2v5h5"/><path d="M10 12v5M7.5 14.5L10 12l2.5 2.5"/></svg>
+      </button>
+      <button class="btn-tool" type="button" id="saveBtn" title="Speichern" aria-label="Speichern" disabled>
+        <svg class="toolbar-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h11l3 3v13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M6 2v5h7V2M6 12h8v6H6z"/></svg>
+      </button>
+      <input class="d-none" id="csvFileInput" type="file" accept=".csv,text/csv" />
+      <div class="toolbar-spacer"></div>
+      <div class="filename-group">
+        <svg class="toolbar-icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1.5h5L13 5.5v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-12a1 1 0 0 1 1-1z"/><path d="M9 1.5V5.5h4"/></svg>
+        <input class="filename-input" id="exportFilename" placeholder="Dateiname…" aria-label="Dateiname" />
       </div>
-    </header>
-
+    </div>
     <main class="container-fluid pb-5 px-4" id="printContent">
-      <div class="plan-toolbar">
-        <button class="btn btn-outline-dark" type="button" id="clearBtn">
-          Woche leeren
-        </button>
-        <button class="btn btn-outline-dark" type="button" id="pdfBtn">
-          PDF exportieren
-        </button>
-        <button class="btn btn-outline-dark" type="button" id="csvExportBtn">
-          CSV exportieren
-        </button>
-        <button class="btn btn-outline-dark" type="button" id="csvImportBtn">
-          CSV importieren
-        </button>
-        <button class="btn btn-outline-dark" type="button" id="saveBtn" title="In die zuletzt importierte Datei speichern" disabled>
-          Speichern
-        </button>
-        <input
-          class="d-none"
-          id="csvFileInput"
-          type="file"
-          accept=".csv,text/csv"
-        />
-        <div class="toolbar-spacer"></div>
-        <div class="filename-group">
-          <span class="input-group-text">Dateiname</span>
-          <input
-            class="form-control"
-            id="exportFilename"
-            placeholder="Woche"
-          />
-        </div>
-      </div>
       <div class="row g-4 mb-4">
         <div class="col-lg-4">
           <div class="panel h-100">
