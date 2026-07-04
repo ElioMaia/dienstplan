@@ -13,6 +13,7 @@
       rel="stylesheet"
     />
     <style>
+      /* ===== Base & Layout ===== */
       :root {
         --ink: #11131b;
         --muted: #5b6475;
@@ -39,65 +40,16 @@
         min-height: 100vh;
       }
 
-      .hero {
-        padding: 48px 0 24px;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .hero::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background:
-          radial-gradient(
-            circle at 80% 0%,
-            rgba(10, 79, 110, 0.25) 0%,
-            transparent 50%
-          ),
-          radial-gradient(
-            circle at 0% 100%,
-            rgba(227, 108, 91, 0.2) 0%,
-            transparent 55%
-          );
-        z-index: 0;
-      }
-
-      .hero-content {
-        position: relative;
-        z-index: 1;
-      }
-
-      .badge-pill {
-        background: var(--night);
-        color: #f8f1e5;
-        letter-spacing: 0.08em;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        padding: 0.35rem 0.75rem;
-        border-radius: 999px;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-      }
-
-      .badge-pill span {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--sun);
-      }
-
       .panel {
         background: rgba(255, 255, 255, 0.8);
-        border-radius: 24px;
-        box-shadow: 0 24px 55px rgba(14, 18, 41, 0.12);
-        padding: 28px;
+        border-radius: 20px;
+        box-shadow: 0 18px 40px rgba(14, 18, 41, 0.10);
+        padding: 22px;
         backdrop-filter: blur(16px);
         border: 1px solid rgba(17, 19, 27, 0.08);
       }
 
+      /* ===== Form ===== */
       .form-label {
         font-weight: 600;
         color: var(--ink);
@@ -105,10 +57,45 @@
 
       .form-section {
         background: rgba(255, 255, 255, 0.75);
-        border-radius: 18px;
+        border-radius: 14px;
         border: 1px solid rgba(17, 19, 27, 0.08);
-        padding: 16px;
-        margin-bottom: 16px;
+        padding: 14px;
+        margin-bottom: 12px;
+      }
+
+      .form-details {
+        padding: 0;
+      }
+
+      .form-details > summary {
+        padding: 12px 14px;
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+      }
+
+      .form-details > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .form-details > summary::after {
+        content: "›";
+        font-size: 1.3rem;
+        font-weight: 300;
+        color: var(--muted);
+        transition: transform 0.2s ease;
+        transform: rotate(90deg);
+      }
+
+      .form-details[open] > summary::after {
+        transform: rotate(-90deg);
+      }
+
+      .form-details > div {
+        padding: 0 14px 14px;
       }
 
       .form-section-title {
@@ -129,12 +116,83 @@
         flex: 1 1 260px;
       }
 
+      .week-nav {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .week-nav .form-control {
+        flex: 1;
+      }
+
+      .btn-week-nav {
+        flex: 0 0 36px;
+        width: 36px;
+        height: 38px;
+        border-radius: 10px;
+        border: 1px solid rgba(17, 19, 27, 0.15);
+        background: rgba(255, 255, 255, 0.8);
+        color: var(--ink);
+        font-size: 1.3rem;
+        font-weight: 300;
+        line-height: 1;
+        padding: 0;
+        cursor: pointer;
+        transition: all 0.18s ease;
+      }
+
+      .btn-week-nav:hover {
+        background: var(--night);
+        color: #f8f1e5;
+        border-color: var(--night);
+      }
+
+      /* ===== Table ===== */
       .table-card {
-        border-radius: 28px;
+        border-radius: 20px;
         overflow: hidden;
         border: 1px solid rgba(17, 19, 27, 0.08);
         background: #fffdf8;
-        box-shadow: 0 20px 45px rgba(13, 20, 32, 0.15);
+        box-shadow: 0 16px 36px rgba(13, 20, 32, 0.12);
+        position: relative;
+      }
+
+      .table-empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        text-align: center;
+        border-top: 1px solid rgba(17, 19, 27, 0.06);
+      }
+
+      .table-empty-icon {
+        font-size: 2.2rem;
+        font-weight: 300;
+        color: var(--muted);
+        opacity: 0.4;
+        margin-bottom: 8px;
+        line-height: 1;
+      }
+
+      .table-empty-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 4px;
+      }
+
+      .table-empty-hint {
+        font-size: 0.85rem;
+        color: var(--muted);
+        max-width: 320px;
+      }
+
+      /* Hide empty-state when member rows exist */
+      .table-card:has(tr[data-member]) .table-empty-state {
+        display: none;
       }
 
       .schedule-table {
@@ -144,11 +202,14 @@
       .schedule-table th {
         background: var(--night);
         color: #f8f1e5;
-        padding: 16px;
+        padding: 12px 14px;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         border: none;
+        position: sticky;
+        top: 0;
+        z-index: 2;
       }
 
       .schedule-table th,
@@ -174,14 +235,43 @@
       }
 
       .schedule-table td {
-        padding: 12px 10px;
+        padding: 10px 8px;
         border-color: rgba(17, 19, 27, 0.08);
         font-weight: 500;
-        font-size: 1rem;
+        font-size: 0.95rem;
+        transition: background 0.15s ease;
       }
 
       .schedule-table tbody td {
-        height: 110px;
+        height: 88px;
+      }
+
+      .schedule-table tbody tr:hover td {
+        background: rgba(244, 163, 64, 0.08);
+      }
+
+      .schedule-table tbody tr[data-row-type="events"]:hover td {
+        background: rgba(10, 79, 110, 0.06);
+      }
+
+      .schedule-table td[data-day]:hover {
+        background: rgba(244, 163, 64, 0.14);
+        cursor: pointer;
+      }
+
+      .schedule-table td.cell-active {
+        outline: 2px solid var(--ocean);
+        outline-offset: -2px;
+        background: rgba(10, 79, 110, 0.06);
+      }
+
+      @keyframes cellFlash {
+        0% { background: rgba(79, 124, 88, 0.35); }
+        100% { background: transparent; }
+      }
+
+      .schedule-table td.cell-flash {
+        animation: cellFlash 1.2s ease-out;
       }
 
       .schedule-table tr[data-row-type="events"] td {
@@ -215,6 +305,18 @@
 
       .schedule-table th.std-sum-col {
         width: 6.4rem;
+      }
+
+      .total-cell.total-ok {
+        color: var(--moss);
+      }
+
+      .total-cell.total-under {
+        color: #b5730a;
+      }
+
+      .total-cell.total-over {
+        color: var(--rose);
       }
 
       .schedule-table th.stand-vz-col {
@@ -280,29 +382,40 @@
         font-style: italic;
       }
 
+      .schedule-table .text-muted.small:not(.w-100) {
+        color: var(--ocean) !important;
+        font-size: 0.72rem !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-top: 2px;
+      }
+
+      /* ===== Legend ===== */
       .legend-block {
-        border: 1px dashed rgba(17, 19, 27, 0.2);
-        border-radius: 18px;
-        padding: 16px;
-        background: rgba(255, 255, 255, 0.75);
+        border: 1px dashed rgba(17, 19, 27, 0.18);
+        border-radius: 14px;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.7);
       }
 
       .legend-title {
-        font-size: 0.72rem;
+        font-size: 0.68rem;
         text-transform: uppercase;
         letter-spacing: 0.14em;
         color: var(--muted);
         font-weight: 600;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
       }
 
       .legend-content {
-        min-height: 72px;
-        border-radius: 12px;
-        padding: 10px 12px;
-        border: 1px solid rgba(17, 19, 27, 0.12);
+        min-height: 48px;
+        border-radius: 10px;
+        padding: 8px 10px;
+        border: 1px solid rgba(17, 19, 27, 0.10);
         background: #fffdf8;
         color: var(--ink);
+        font-size: 0.9rem;
       }
 
       .legend-content:empty::before {
@@ -310,35 +423,188 @@
         color: var(--muted);
       }
 
+      /* ===== Toolbar (desktop-style, full-width) ===== */
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        padding: 0 16px;
+        height: 48px;
+        background: var(--night);
+        color: #f8f1e5;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 12px rgba(14, 18, 41, 0.18);
+        margin-bottom: 20px;
+      }
+
+      .toolbar-brand {
+        font-size: 0.9rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: #f8f1e5;
+        margin-right: 8px;
+        user-select: none;
+        white-space: nowrap;
+      }
+
+      .toolbar-spacer {
+        flex: 1;
+      }
+
+      .toolbar-divider {
+        width: 1px;
+        height: 20px;
+        background: rgba(248, 241, 229, 0.2);
+        margin: 0 8px;
+        flex-shrink: 0;
+      }
+
+      .btn-tool {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        border: none;
+        background: transparent;
+        color: rgba(248, 241, 229, 0.6);
+        cursor: pointer;
+        transition: all 0.15s ease;
+        position: relative;
+        flex-shrink: 0;
+      }
+
+      .btn-tool:hover {
+        background: rgba(248, 241, 229, 0.12);
+        color: #f8f1e5;
+      }
+
+      .btn-tool:active {
+        background: rgba(248, 241, 229, 0.20);
+      }
+
+      .btn-tool:disabled {
+        opacity: 0.30;
+        cursor: default;
+      }
+
+      .btn-tool:disabled:hover {
+        background: transparent;
+        color: rgba(248, 241, 229, 0.6);
+      }
+
+      .toolbar-icon {
+        width: 19px;
+        height: 19px;
+        flex-shrink: 0;
+      }
+
+      .toolbar-icon-sm {
+        width: 13px;
+        height: 13px;
+        flex-shrink: 0;
+        color: rgba(248, 241, 229, 0.5);
+      }
+
+      .filename-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(248, 241, 229, 0.10);
+        border-radius: 8px;
+        padding: 0 10px;
+        height: 32px;
+        transition: background 0.15s ease;
+      }
+
+      .filename-group:focus-within {
+        background: rgba(248, 241, 229, 0.18);
+      }
+
+      .filename-group .filename-input {
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        outline: none;
+        padding: 0;
+        width: 140px;
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: #f8f1e5;
+        font-family: "IBM Plex Mono", monospace;
+      }
+
+      .filename-group .filename-input::placeholder {
+        color: rgba(248, 241, 229, 0.4);
+      }
+
+      /* ===== Form Buttons ===== */
       .btn-primary {
         background: var(--night);
         border-color: var(--night);
-        box-shadow: 0 10px 18px rgba(21, 26, 46, 0.25);
+        box-shadow: 0 8px 16px rgba(21, 26, 46, 0.22);
+        transition: all 0.18s ease;
       }
 
       .btn-primary:hover {
         background: #0e1224;
         border-color: #0e1224;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px rgba(21, 26, 46, 0.28);
       }
 
       .btn-outline-dark {
-        border-radius: 999px;
+        border-radius: 10px;
+        transition: all 0.18s ease;
+      }
+
+      .btn-outline-dark:hover {
+        background: var(--night);
+        color: #f8f1e5;
+      }
+
+      .btn-outline-danger {
+        border-radius: 10px;
+        transition: all 0.18s ease;
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: var(--ocean);
+        box-shadow: 0 0 0 3px rgba(10, 79, 110, 0.15);
+      }
+
+      .form-control.is-invalid {
+        border-color: var(--rose);
+        background: rgba(227, 108, 91, 0.06);
+      }
+
+      .form-control.is-invalid:focus {
+        border-color: var(--rose);
+        box-shadow: 0 0 0 3px rgba(227, 108, 91, 0.18);
       }
 
       .action-buttons {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 8px;
       }
 
       .action-buttons .btn {
-        flex: 1 1 160px;
+        flex: 1 1 140px;
+        border-radius: 10px;
+        font-size: 0.88rem;
+        font-weight: 500;
       }
 
       .action-buttons .btn-primary {
-        flex-basis: 220px;
+        flex-basis: 100%;
       }
 
+      /* ===== Animations ===== */
       .fade-in {
         animation: fadeIn 0.8s ease forwards;
       }
@@ -375,16 +641,37 @@
         }
       }
 
+      /* ===== Responsive ===== */
       @media (max-width: 768px) {
-        .hero {
-          padding: 32px 0 16px;
+        .panel {
+          padding: 16px;
         }
 
-        .panel {
-          padding: 20px;
+        .toolbar {
+          padding: 0 8px;
+          height: 44px;
+          overflow-x: auto;
+        }
+
+        .toolbar-brand {
+          display: none;
+        }
+
+        .btn-tool {
+          width: 30px;
+          height: 30px;
+        }
+
+        .filename-group .filename-input {
+          width: 90px;
+        }
+
+        .schedule-table tbody td {
+          height: 64px;
         }
       }
 
+      /* ===== Print / PDF ===== */
       body.pdf-export-mode {
         background: #ffffff;
         color: #0f172a;
@@ -392,9 +679,10 @@
         print-color-adjust: exact;
       }
 
-      body.pdf-export-mode .hero,
       body.pdf-export-mode .panel,
       body.pdf-export-mode .legend,
+      body.pdf-export-mode .toolbar,
+      body.pdf-export-mode .table-empty-state,
       body.pdf-export-mode form,
       body.pdf-export-mode #pdfBtn,
       body.pdf-export-mode #clearBtn {
@@ -420,11 +708,11 @@
         margin-right: 0 !important;
       }
 
-      body.pdf-export-mode .col-lg-5 {
+      body.pdf-export-mode .col-lg-4 {
         display: none !important;
       }
 
-      body.pdf-export-mode .col-lg-7 {
+      body.pdf-export-mode .col-lg-8 {
         flex: 0 0 100% !important;
         max-width: 100% !important;
       }
@@ -529,9 +817,10 @@
           print-color-adjust: exact;
         }
 
-        .hero,
         .panel,
         .legend,
+        .toolbar,
+        .table-empty-state,
         form,
         #pdfBtn,
         #clearBtn {
@@ -557,11 +846,11 @@
           margin-right: 0 !important;
         }
 
-        .col-lg-5 {
+        .col-lg-4 {
           display: none !important;
         }
 
-        .col-lg-7 {
+        .col-lg-8 {
           flex: 0 0 100% !important;
           max-width: 100% !important;
         }
@@ -654,27 +943,36 @@
     </style>
   </head>
   <body>
-    <header class="hero">
-      <div class="container hero-content">
-        <div class="row align-items-center g-4">
-          <div>
-            <div class="badge-pill mb-3"><span></span>Dienstplan Studio</div>
-            <h1 class="display-4 fw-bold">Dienstpläne</h1>
-            <p class="lead text-muted">
-              Plane ausgewogene Rotationen, sieh die Abdeckung sofort und halte
-              dein Team auf einen Blick synchron. Die Daten bleiben lokal und
-              werden nicht gespeichert.
-            </p>
-          </div>
-        </div>
+    <div class="toolbar" id="toolbar">
+      <div class="toolbar-brand">Dienstplan</div>
+      <div class="toolbar-divider"></div>
+      <button class="btn-tool" type="button" id="clearBtn" title="Woche leeren" aria-label="Woche leeren">
+        <svg class="toolbar-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 6h10M8 6V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2M6 6l1 11a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1l1-11"/></svg>
+      </button>
+      <button class="btn-tool" type="button" id="pdfBtn" title="PDF exportieren" aria-label="PDF exportieren">
+        <svg class="toolbar-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h9l5 5v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M12 2v5h5"/><text x="6" y="16" font-size="6" fill="currentColor" stroke="none" font-weight="700">PDF</text></svg>
+      </button>
+      <button class="btn-tool" type="button" id="csvExportBtn" title="CSV exportieren" aria-label="CSV exportieren">
+        <svg class="toolbar-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h9l5 5v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M12 2v5h5"/><path d="M6 11h8M6 14h8M6 17h5"/></svg>
+      </button>
+      <button class="btn-tool" type="button" id="csvImportBtn" title="CSV importieren" aria-label="CSV importieren">
+        <svg class="toolbar-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h9l5 5v11a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M12 2v5h5"/><path d="M10 12v5M7.5 14.5L10 12l2.5 2.5"/></svg>
+      </button>
+      <button class="btn-tool" type="button" id="saveBtn" title="Speichern" aria-label="Speichern" disabled>
+        <svg class="toolbar-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h11l3 3v13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M6 2v5h7V2M6 12h8v6H6z"/></svg>
+      </button>
+      <input class="d-none" id="csvFileInput" type="file" accept=".csv,text/csv" />
+      <div class="toolbar-spacer"></div>
+      <div class="filename-group">
+        <svg class="toolbar-icon-sm" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1.5h5L13 5.5v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-12a1 1 0 0 1 1-1z"/><path d="M9 1.5V5.5h4"/></svg>
+        <input class="filename-input" id="exportFilename" placeholder="Dateiname…" aria-label="Dateiname" />
       </div>
-    </header>
-
+    </div>
     <main class="container-fluid pb-5 px-4" id="printContent">
       <div class="row g-4 mb-4">
-        <div class="col-lg-5">
+        <div class="col-lg-4">
           <div class="panel h-100">
-            <h2 class="h4 fw-semibold mb-3">Zum Dienstplan hinzufügen</h2>
+            <h2 class="h6 fw-semibold mb-3 text-uppercase" style="letter-spacing: 0.06em; color: var(--muted);">Dienst hinzufügen</h2>
             <div class="form-section">
               <div class="form-section-title mb-2">Wocheneinstellungen</div>
               <div class="week-config">
@@ -682,10 +980,13 @@
                   <label class="form-label" for="weekSelect"
                     >Kalenderwoche</label
                   >
-                  <input class="form-control" id="weekSelect" type="week" />
+                  <div class="week-nav">
+                    <button type="button" class="btn btn-week-nav" id="weekPrevBtn" title="Vorherige Woche">‹</button>
+                    <input class="form-control" id="weekSelect" type="week" />
+                    <button type="button" class="btn btn-week-nav" id="weekNextBtn" title="Nächste Woche">›</button>
+                  </div>
                   <div class="form-text">
-                    Gilt für den gesamten Wochenplan und bleibt beim Hinzufügen
-                    oder Bearbeiten von Diensten erhalten.
+                    Gilt für den gesamten Wochenplan.
                   </div>
                 </div>
               </div>
@@ -694,7 +995,7 @@
               <div class="form-section">
                 <div class="form-section-title mb-2">Dienst</div>
                 <div class="row g-3">
-                  <div class="col-md-6">
+                  <div class="col-12">
                     <label class="form-label" for="memberName"
                       >Teammitglied</label
                     >
@@ -702,10 +1003,12 @@
                       class="form-control"
                       id="memberName"
                       placeholder="Vor-/Nachname"
+                      list="memberList"
                       required
                     />
+                    <datalist id="memberList"></datalist>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-6">
                     <label class="form-label" for="weekday">Tag</label>
                     <select class="form-select" id="weekday" required>
                       <option value="">Tag auswählen</option>
@@ -716,7 +1019,7 @@
                       <option>Freitag</option>
                     </select>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-6">
                     <label class="form-label" for="entryType"
                       >Eintragstyp</label
                     >
@@ -727,7 +1030,15 @@
                       <option value="Feiertag">Feiertag</option>
                     </select>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-6">
+                    <label class="form-label" for="startTime">Startzeit</label>
+                    <input class="form-control" id="startTime" type="time" />
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label" for="endTime">Endzeit</label>
+                    <input class="form-control" id="endTime" type="time" />
+                  </div>
+                  <div class="col-12">
                     <label class="form-label" for="absenceHours">
                       Tagesarbeitszeit (Std.)
                     </label>
@@ -741,16 +1052,8 @@
                       disabled
                     />
                     <div class="form-text">
-                      Nur bei Urlaub/Krank/Feiertag erforderlich.
+                      Nur bei Urlaub/Krank/Feiertag.
                     </div>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label" for="startTime">Startzeit</label>
-                    <input class="form-control" id="startTime" type="time" />
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label" for="endTime">Endzeit</label>
-                    <input class="form-control" id="endTime" type="time" />
                   </div>
                   <div class="col-12">
                     <label class="form-label" for="location"
@@ -764,12 +1067,12 @@
                   </div>
                 </div>
               </div>
-              <div class="form-section">
-                <div
-                  class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2"
-                >
-                  <div class="form-section-title">Ereignis</div>
-                  <div class="form-check m-0">
+              <details class="form-section form-details">
+                <summary class="form-section-title d-flex align-items-center justify-content-between">
+                  <span>Ereignis (optional)</span>
+                </summary>
+                <div class="mt-3">
+                  <div class="form-check mb-2">
                     <input
                       class="form-check-input"
                       type="checkbox"
@@ -779,26 +1082,35 @@
                       Ereignis hinzufügen
                     </label>
                   </div>
-                </div>
-                <div class="row g-3">
-                  <div class="col-12">
-                    <label class="form-label" for="eventTitle">Ereignis</label>
-                    <input
-                      class="form-control"
-                      id="eventTitle"
-                      placeholder="z. B. Teamtag"
-                      disabled
-                    />
-                    <div class="form-text">
-                      Optional: Start- und Endzeit setzen, wenn das Ereignis
-                      einen festen Slot hat. Fett mit **Text**.
+                  <div class="row g-3">
+                    <div class="col-12">
+                      <label class="form-label" for="eventTitle">Ereignis</label>
+                      <input
+                        class="form-control"
+                        id="eventTitle"
+                        placeholder="z. B. Teamtag"
+                        disabled
+                      />
+                      <div class="form-text">
+                        Optional: Start- und Endzeit setzen für feste Slots. <strong>**Fett**</strong>.
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </details>
               <div class="action-buttons">
-                <button class="btn btn-primary flex-grow-1" type="submit">
-                  Zeiten hinzufügen
+                <div class="form-check mb-2 w-100">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="allDaysToggle"
+                  />
+                  <label class="form-check-label" for="allDaysToggle" style="font-size: 0.85rem;">
+                    Auf alle Tage anwenden
+                  </label>
+                </div>
+                <button class="btn btn-primary flex-grow-1" type="submit" id="submitBtn">
+                  Dienst hinzufügen
                 </button>
                 <button
                   class="btn btn-outline-danger"
@@ -808,57 +1120,19 @@
                 >
                   Eintrag löschen
                 </button>
-                <button
-                  class="btn btn-outline-dark"
-                  type="button"
-                  id="clearBtn"
-                >
-                  Woche leeren
-                </button>
-                <button class="btn btn-outline-dark" type="button" id="pdfBtn">
-                  PDF exportieren
-                </button>
-                <button
-                  class="btn btn-outline-dark"
-                  type="button"
-                  id="csvExportBtn"
-                >
-                  CSV exportieren
-                </button>
-                <button
-                  class="btn btn-outline-dark"
-                  type="button"
-                  id="csvImportBtn"
-                >
-                  CSV importieren
-                </button>
-                <input
-                  class="d-none"
-                  id="csvFileInput"
-                  type="file"
-                  accept=".csv,text/csv"
-                />
-                <div class="w-100"></div>
-                <div class="input-group mt-2">
-                  <span class="input-group-text">Dateiname</span>
-                  <input
-                    class="form-control"
-                    id="exportFilename"
-                    placeholder="Woche"
-                  />
-                </div>
               </div>
             </form>
           </div>
         </div>
-        <div class="col-lg-7">
+        <div class="col-lg-8">
           <div class="table-card h-100">
             <div class="table-responsive">
               <table class="table schedule-table" id="scheduleTable">
                 <thead>
                   <tr>
                     <th>Mitarbeiter</th>
-                    <th class="stand-vz-col">Stand VZ</th>
+                    <!-- Stand VZ: intentionally left empty — placeholder for contracted weekly hours (Vollzeit-Äquivalent), populated externally -->
+                    <th class="stand-vz-col" title="Verfügbare Arbeitszeit pro Woche (Vollzeit-Äquivalent)">Stand VZ</th>
                     <th data-day="Montag">
                       <span class="day-label">Montag</span>
                       <span class="day-date d-none"></span>
@@ -885,6 +1159,11 @@
                 <tbody id="scheduleBody"></tbody>
               </table>
             </div>
+            <div class="table-empty-state" id="emptyState">
+              <div class="table-empty-icon">＋</div>
+              <div class="table-empty-title">Noch keine Einträge</div>
+              <div class="table-empty-hint">Füge links einen Dienst hinzu oder klicke auf eine Zelle, um zu starten.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -899,1366 +1178,17 @@
       </div>
     </main>
 
-    <script>
-      const scheduleForm = document.getElementById("scheduleForm");
-      const memberInput = document.getElementById("memberName");
-      const weekdaySelect = document.getElementById("weekday");
-      const weekInput = document.getElementById("weekSelect");
-      const startTimeInput = document.getElementById("startTime");
-      const endTimeInput = document.getElementById("endTime");
-      const locationInput = document.getElementById("location");
-      const entryTypeSelect = document.getElementById("entryType");
-      const absenceHoursInput = document.getElementById("absenceHours");
-      const allDayEventToggle = document.getElementById("allDayEvent");
-      const eventTitleInput = document.getElementById("eventTitle");
-      const clearBtn = document.getElementById("clearBtn");
-      const deleteBtn = document.getElementById("deleteBtn");
-      const pdfBtn = document.getElementById("pdfBtn");
-      const csvExportBtn = document.getElementById("csvExportBtn");
-      const csvImportBtn = document.getElementById("csvImportBtn");
-      const csvFileInput = document.getElementById("csvFileInput");
-      const exportFilenameInput = document.getElementById("exportFilename");
-      const scheduleBody = document.getElementById("scheduleBody");
-      const legendContent = document.getElementById("legendContent");
-      const printContent = document.getElementById("printContent");
-      const weekdayHeaders = Array.from(
-        document.querySelectorAll("th[data-day]"),
-      );
+        <script>window.Dienstplan = window.Dienstplan || {};</script>
+    <script src="js/time.js"></script>
+    <script src="js/break-rules.js"></script>
+    <script src="js/csv.js"></script>
+    <script src="js/week.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/form.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/import.js"></script>
+    <script src="js/app.js"></script>
 
-      const weekDays = [
-        "Montag",
-        "Dienstag",
-        "Mittwoch",
-        "Donnerstag",
-        "Freitag",
-      ];
-
-      const schedule = {};
-      const allDayEvents = weekDays.reduce((acc, day) => {
-        acc[day] = [];
-        return acc;
-      }, {});
-      const eventEditState = { day: null, index: null };
-      const entryEditState = { member: null, day: null, index: null };
-
-      function parseTimeToMinutes(value) {
-        if (!value) {
-          return null;
-        }
-        const [hours, minutes] = value.split(":").map(Number);
-        return hours * 60 + minutes;
-      }
-
-      function calculateDurationMinutes(startValue, endValue) {
-        const start = parseTimeToMinutes(startValue);
-        const end = parseTimeToMinutes(endValue);
-        if (start === null || end === null) {
-          return 0;
-        }
-        if (end >= start) {
-          return end - start;
-        }
-        return 24 * 60 - start + end;
-      }
-
-      function formatHours(minutes) {
-        const totalMinutes = Math.round(minutes);
-        const hours = Math.floor(totalMinutes / 60);
-        const remainingMinutes = totalMinutes % 60;
-        if (remainingMinutes === 0) {
-          return `${hours} h`;
-        }
-        return `${hours} h ${remainingMinutes} min`;
-      }
-
-      function formatHoursDecimal(minutes) {
-        return (minutes / 60).toFixed(2);
-      }
-
-      function formatHoursDecimalInput(minutes) {
-        return formatHoursDecimal(minutes).replace(".", ",");
-      }
-
-      function getExportFilename(extension) {
-        const rawName = exportFilenameInput
-          ? exportFilenameInput.value.trim()
-          : "";
-        const baseName = rawName || "dienstplan";
-        const safeName = baseName.replace(/[\\/:*?"<>|]+/g, "-");
-        return `${safeName}${extension}`;
-      }
-
-      function getExportBaseName() {
-        const rawName = exportFilenameInput
-          ? exportFilenameInput.value.trim()
-          : "";
-        const baseName = rawName || "dienstplan";
-        return baseName.replace(/[\\/:*?"<>|]+/g, "-");
-      }
-
-      function escapeHtml(value) {
-        return String(value)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#39;");
-      }
-
-      function formatEventTitle(value) {
-        const escaped = escapeHtml(value);
-        return escaped.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-      }
-
-      const DEFAULT_FULL_DAY_MINUTES = 8 * 60;
-      const absenceTypes = new Set(["Urlaub", "Krank", "Feiertag"]);
-
-      function isAbsenceEntry(entry) {
-        return entry && absenceTypes.has(entry.type);
-      }
-
-      function isTimedEntry(entry) {
-        return Boolean(entry && entry.startTime && entry.endTime);
-      }
-
-      function parseHoursToMinutes(value) {
-        if (value === null || value === undefined) {
-          return null;
-        }
-        const normalized = String(value).trim().replace(",", ".");
-        if (!normalized) {
-          return null;
-        }
-        const hours = Number(normalized);
-        if (!Number.isFinite(hours) || hours <= 0) {
-          return null;
-        }
-        return Math.round(hours * 60);
-      }
-
-      function getEntryWindowMinutes(entry) {
-        const start = parseTimeToMinutes(entry.startTime);
-        const end = parseTimeToMinutes(entry.endTime);
-        if (start === null || end === null) {
-          return null;
-        }
-        const normalizedEnd = end >= start ? end : end + 24 * 60;
-        return { start, end: normalizedEnd };
-      }
-
-      function applyBreakRule(entries) {
-        if (!entries || entries.length === 0) {
-          return {
-            netMinutes: 0,
-            hasBreak: false,
-            breakEntries: new Set(),
-            breakDeductionEntries: new Set(),
-          };
-        }
-        const entryWindows = entries
-          .filter(isTimedEntry)
-          .map((entry) => {
-            const window = getEntryWindowMinutes(entry);
-            if (!window) {
-              return null;
-            }
-            return {
-              entry,
-              start: window.start,
-              end: window.end,
-              duration: window.end - window.start,
-            };
-          })
-          .filter(Boolean)
-          .sort((a, b) => a.start - b.start);
-
-        const totalMinutes = entryWindows.reduce(
-          (sum, entry) => sum + entry.duration,
-          0,
-        );
-
-        if (entryWindows.length > 0) {
-          let netMinutes = totalMinutes;
-          let hasBreak = false;
-          const breakEntries = new Set();
-          const breakDeductionEntries = new Set();
-          const blocks = [];
-          let currentBlock = [];
-
-          entryWindows.forEach((entry, index) => {
-            if (index === 0) {
-              currentBlock.push(entry);
-              return;
-            }
-
-            const previous = entryWindows[index - 1];
-            if (entry.start - previous.end >= 30) {
-              blocks.push(currentBlock);
-              currentBlock = [entry];
-              return;
-            }
-
-            currentBlock.push(entry);
-          });
-
-          if (currentBlock.length > 0) {
-            blocks.push(currentBlock);
-          }
-
-          blocks.forEach((block) => {
-            const blockMinutes = block.reduce(
-              (sum, entry) => sum + entry.duration,
-              0,
-            );
-
-            if (blockMinutes <= 6 * 60) {
-              return;
-            }
-
-            hasBreak = true;
-            netMinutes = Math.max(0, netMinutes - 30);
-
-            let cumulativeMinutes = 0;
-            let breakWindow = block[block.length - 1];
-            block.forEach((entry) => {
-              if (breakWindow !== block[block.length - 1]) {
-                return;
-              }
-              if (cumulativeMinutes + entry.duration > 6 * 60) {
-                breakWindow = entry;
-              }
-              cumulativeMinutes += entry.duration;
-            });
-
-            breakEntries.add(breakWindow.entry);
-            breakDeductionEntries.add(breakWindow.entry);
-          });
-
-          return {
-            netMinutes,
-            hasBreak,
-            breakEntries,
-            breakDeductionEntries,
-          };
-        }
-        return {
-          netMinutes: totalMinutes,
-          hasBreak: false,
-          breakEntries: new Set(),
-          breakDeductionEntries: new Set(),
-        };
-      }
-
-      function calculateDayTotals(entries) {
-        if (!entries || entries.length === 0) {
-          return {
-            netMinutes: 0,
-            hasBreak: false,
-            shiftMinutes: 0,
-            hasCountableEntry: false,
-            breakEntries: new Set(),
-            breakDeductionEntries: new Set(),
-          };
-        }
-        const absenceMinutes = entries
-          .filter(isAbsenceEntry)
-          .reduce(
-            (sum, entry) =>
-              sum + (entry.absenceMinutes || DEFAULT_FULL_DAY_MINUTES),
-            0,
-          );
-        const shiftEntries = entries.filter((entry) => !isAbsenceEntry(entry));
-        const {
-          netMinutes: shiftMinutes,
-          hasBreak,
-          breakEntries,
-          breakDeductionEntries,
-        } = applyBreakRule(shiftEntries);
-        const timedShiftEntries = shiftEntries.filter(isTimedEntry);
-        const hasCountableEntry =
-          timedShiftEntries.length > 0 || absenceMinutes > 0;
-        return {
-          netMinutes: shiftMinutes + absenceMinutes,
-          hasBreak,
-          shiftMinutes,
-          hasCountableEntry,
-          breakEntries,
-          breakDeductionEntries,
-        };
-      }
-
-      function parseWeekValue(value) {
-        if (!value) {
-          return null;
-        }
-        const parts = value.split("-W");
-        if (parts.length !== 2) {
-          return null;
-        }
-        const year = Number(parts[0]);
-        const week = Number(parts[1]);
-        if (!Number.isInteger(year) || !Number.isInteger(week)) {
-          return null;
-        }
-        return { year, week };
-      }
-
-      function getIsoWeekStartDate(year, week) {
-        const jan4 = new Date(year, 0, 4);
-        const jan4Day = jan4.getDay() || 7;
-        const mondayWeek1 = new Date(jan4);
-        mondayWeek1.setDate(jan4.getDate() - jan4Day + 1);
-        const mondayTarget = new Date(mondayWeek1);
-        mondayTarget.setDate(mondayWeek1.getDate() + (week - 1) * 7);
-        return mondayTarget;
-      }
-
-      function formatDate(date) {
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-        return `${day}.${month}.${year}`;
-      }
-
-      function updateWeekdayHeaders(weekValue) {
-        const parsed = parseWeekValue(weekValue);
-        const headerMap = new Map(
-          weekdayHeaders.map((header) => [
-            header.getAttribute("data-day"),
-            header,
-          ]),
-        );
-        if (!parsed) {
-          weekDays.forEach((day) => {
-            const header = headerMap.get(day);
-            if (!header) {
-              return;
-            }
-            const dateSpan = header.querySelector(".day-date");
-            if (dateSpan) {
-              dateSpan.textContent = "";
-              dateSpan.classList.add("d-none");
-            }
-          });
-          return;
-        }
-
-        const monday = getIsoWeekStartDate(parsed.year, parsed.week);
-        weekDays.forEach((day, index) => {
-          const header = headerMap.get(day);
-          if (!header) {
-            return;
-          }
-          const current = new Date(monday);
-          current.setDate(monday.getDate() + index);
-          const dateSpan = header.querySelector(".day-date");
-          if (dateSpan) {
-            dateSpan.textContent = formatDate(current);
-            dateSpan.classList.remove("d-none");
-          }
-        });
-      }
-
-      function syncLegendPrintState() {
-        const legendBlock = legendContent.closest(".legend-block");
-        if (!legendBlock) {
-          return;
-        }
-        const hasContent = legendContent.innerText.trim().length > 0;
-        legendBlock.classList.toggle("is-empty", !hasContent);
-      }
-
-      function getPixelsPerMillimeter() {
-        const probe = document.createElement("div");
-        probe.style.position = "absolute";
-        probe.style.visibility = "hidden";
-        probe.style.width = "100mm";
-        document.body.appendChild(probe);
-        const pixelsPerMillimeter = probe.getBoundingClientRect().width / 100;
-        probe.remove();
-        return pixelsPerMillimeter;
-      }
-
-      function preparePdfExport() {
-        const pixelsPerMillimeter = getPixelsPerMillimeter();
-        const printableWidth = (297 - 20) * pixelsPerMillimeter;
-        const printableHeight = (210 - 20) * pixelsPerMillimeter;
-
-        document.body.style.setProperty(
-          "--print-sheet-width",
-          `${printableWidth}px`,
-        );
-        document.body.style.setProperty("--print-scale", "1");
-        document.body.classList.add("pdf-export-mode");
-
-        const contentWidth = Math.max(printContent.scrollWidth, 1);
-        const contentHeight = Math.max(printContent.scrollHeight, 1);
-        const scale = Math.min(
-          1,
-          printableWidth / contentWidth,
-          printableHeight / contentHeight,
-        );
-        const adjustedSheetWidth = printableWidth / scale;
-
-        document.body.style.setProperty(
-          "--print-sheet-width",
-          `${adjustedSheetWidth}px`,
-        );
-        document.body.style.setProperty("--print-scale", scale.toFixed(4));
-
-        return () => {
-          document.body.classList.remove("pdf-export-mode");
-          document.body.style.removeProperty("--print-scale");
-          document.body.style.removeProperty("--print-sheet-width");
-        };
-      }
-
-      function resetEntryFormFields() {
-        scheduleForm.reset();
-        memberInput.value = "";
-        weekdaySelect.value = "";
-        startTimeInput.value = "";
-        endTimeInput.value = "";
-        locationInput.value = "";
-        eventTitleInput.value = "";
-        entryTypeSelect.value = "Dienst";
-        absenceHoursInput.value = "7,8";
-        allDayEventToggle.checked = false;
-        toggleEventMode(false);
-      }
-
-      function escapeCsvValue(value, delimiter) {
-        if (value === null || value === undefined) {
-          return "";
-        }
-        const stringValue = String(value);
-        if (
-          stringValue.includes('"') ||
-          stringValue.includes("\n") ||
-          stringValue.includes("\r") ||
-          stringValue.includes(delimiter)
-        ) {
-          return `"${stringValue.replace(/"/g, '""')}"`;
-        }
-        return stringValue;
-      }
-
-      function parseCsvLine(line, delimiter) {
-        const values = [];
-        let current = "";
-        let inQuotes = false;
-
-        for (let i = 0; i < line.length; i += 1) {
-          const char = line[i];
-          const nextChar = line[i + 1];
-
-          if (char === '"' && inQuotes && nextChar === '"') {
-            current += '"';
-            i += 1;
-            continue;
-          }
-
-          if (char === '"') {
-            inQuotes = !inQuotes;
-            continue;
-          }
-
-          if (char === delimiter && !inQuotes) {
-            values.push(current);
-            current = "";
-            continue;
-          }
-
-          current += char;
-        }
-
-        values.push(current);
-        return values.map((value) => value.trim());
-      }
-
-      function parseCsvText(text) {
-        const lines = text
-          .split(/\r?\n/)
-          .map((line) => line.trim())
-          .filter((line) => line.length > 0);
-
-        if (!lines.length) {
-          return [];
-        }
-
-        const delimiter = lines[0].includes(";") ? ";" : ",";
-        const rows = lines.map((line) => parseCsvLine(line, delimiter));
-
-        return { delimiter, rows };
-      }
-
-      function updateMetrics() {
-        const members = Object.keys(schedule);
-        let totalMinutes = 0;
-
-        members.forEach((member) => {
-          let memberMinutes = 0;
-          let memberEligible = true;
-          weekDays.forEach((day) => {
-            const entries = schedule[member][day];
-            if (!entries || entries.length === 0) {
-              memberEligible = false;
-              return;
-            }
-            const dayTotals = calculateDayTotals(entries);
-            if (!dayTotals.hasCountableEntry) {
-              memberEligible = false;
-            }
-            memberMinutes += dayTotals.netMinutes;
-          });
-          if (memberEligible) {
-            totalMinutes += memberMinutes;
-          }
-        });
-      }
-
-      function renderTable() {
-        scheduleBody.innerHTML = "";
-        const eventsRow = document.createElement("tr");
-        eventsRow.setAttribute("data-row-type", "events");
-
-        const eventsLabelCell = document.createElement("td");
-        eventsLabelCell.innerHTML = "<strong>Ereignisse</strong>";
-        eventsRow.appendChild(eventsLabelCell);
-
-        const eventsStandCell = document.createElement("td");
-        eventsStandCell.className = "stand-vz-cell";
-        eventsStandCell.textContent = "";
-        eventsRow.appendChild(eventsStandCell);
-
-        weekDays.forEach((day) => {
-          const cell = document.createElement("td");
-          cell.setAttribute("data-day", day);
-          cell.className = "events-cell";
-          const events = allDayEvents[day];
-          if (!events || events.length === 0) {
-            cell.textContent = "—";
-          } else {
-            cell.textContent = "";
-            events.forEach((eventData, index) => {
-              const item = document.createElement("div");
-              item.className = "event-item";
-              const timeLabel =
-                eventData.startTime && eventData.endTime
-                  ? `${eventData.startTime}–${eventData.endTime}`
-                  : ""; //Ganztätig Kommentar
-              if (timeLabel == "") {
-                item.innerHTML = formatEventTitle(eventData.title);
-              } else {
-                item.innerHTML = `<span class="event-time">${escapeHtml(
-                  timeLabel,
-                )}</span> · ${formatEventTitle(eventData.title)}`;
-              }
-              item.setAttribute("data-event-index", String(index));
-              cell.appendChild(item);
-            });
-          }
-          eventsRow.appendChild(cell);
-        });
-
-        const eventsTotalCell = document.createElement("td");
-        eventsTotalCell.textContent = "";
-        eventsRow.appendChild(eventsTotalCell);
-        scheduleBody.appendChild(eventsRow);
-
-        const members = Object.keys(schedule);
-
-        members.forEach((member) => {
-          const row = document.createElement("tr");
-          row.setAttribute("data-member", member);
-
-          const nameCell = document.createElement("td");
-          nameCell.innerHTML = `<strong>${member}</strong>`;
-          row.appendChild(nameCell);
-
-          const standCell = document.createElement("td");
-          standCell.className = "stand-vz-cell";
-          standCell.textContent = "";
-          row.appendChild(standCell);
-
-          let memberMinutes = 0;
-          let memberEligible = true;
-
-          weekDays.forEach((day) => {
-            const cell = document.createElement("td");
-            cell.setAttribute("data-day", day);
-            const entries = schedule[member][day];
-
-            if (!entries || entries.length === 0) {
-              memberEligible = false;
-              const placeholder = document.createElement("div");
-              placeholder.className = "text-muted";
-              placeholder.textContent = "—";
-              cell.appendChild(placeholder);
-            } else {
-              const {
-                netMinutes,
-                hasBreak,
-                shiftMinutes,
-                hasCountableEntry,
-                breakEntries,
-                breakDeductionEntries,
-              } = calculateDayTotals(entries);
-              if (!hasCountableEntry) {
-                memberEligible = false;
-              }
-              memberMinutes += netMinutes;
-
-              entries.forEach((entry, index) => {
-                const line = document.createElement("div");
-                line.className = "d-flex align-items-center flex-wrap";
-                line.setAttribute("data-entry-index", String(index));
-
-                if (isAbsenceEntry(entry)) {
-                  const absenceMinutes =
-                    entry.absenceMinutes || DEFAULT_FULL_DAY_MINUTES;
-                  const label = document.createElement("span");
-                  label.className = "fw-semibold";
-                  label.textContent = entry.type;
-                  line.appendChild(label);
-
-                  const duration = document.createElement("span");
-                  duration.className = "text-muted duration-text";
-                  duration.textContent = ` (${formatHours(absenceMinutes)})`;
-                  line.appendChild(duration);
-                } else {
-                  const hasTimes = entry.startTime && entry.endTime;
-                  if (hasTimes) {
-                    const timeRange = document.createElement("span");
-                    timeRange.className = "fw-semibold time-range";
-                    timeRange.textContent = `${entry.startTime}–${entry.endTime}`;
-                    line.appendChild(timeRange);
-
-                    const entryMinutes = calculateDurationMinutes(
-                      entry.startTime,
-                      entry.endTime,
-                    );
-                    const duration = document.createElement("span");
-                    duration.className = "text-muted duration-text";
-                    const isSingleShiftEntry =
-                      entries.length === 1 && !isAbsenceEntry(entries[0]);
-                    let displayMinutes = isSingleShiftEntry
-                      ? shiftMinutes
-                      : entryMinutes;
-                    if (
-                      !isSingleShiftEntry &&
-                      hasBreak &&
-                      breakDeductionEntries.has(entry)
-                    ) {
-                      displayMinutes = Math.max(0, entryMinutes - 30);
-                    }
-                    duration.textContent = ` (${formatHours(displayMinutes)})`;
-                    line.appendChild(duration);
-                  }
-
-                  if (entry.location) {
-                    const note = document.createElement("div");
-                    note.className = "text-muted small w-100";
-                    note.textContent = entry.location;
-                    line.appendChild(note);
-                  }
-                }
-
-                cell.appendChild(line);
-                if (
-                  hasBreak &&
-                  breakEntries.has(entry)
-                ) {
-                  const breakNote = document.createElement("div");
-                  breakNote.className = "text-muted small";
-                  breakNote.textContent = "Pause";
-                  cell.appendChild(breakNote);
-                }
-              });
-            }
-
-            row.appendChild(cell);
-          });
-
-          const totalCell = document.createElement("td");
-          totalCell.className = "fw-semibold";
-          totalCell.textContent =
-            memberEligible && memberMinutes > 0
-              ? formatHours(memberMinutes)
-              : "—";
-          row.appendChild(totalCell);
-
-          scheduleBody.appendChild(row);
-        });
-
-        updateMetrics();
-      }
-
-      function addEntry({
-        member,
-        day,
-        startTime,
-        endTime,
-        location,
-        entryType,
-        absenceMinutes,
-      }) {
-        if (!schedule[member]) {
-          schedule[member] = {};
-        }
-
-        if (!schedule[member][day]) {
-          schedule[member][day] = [];
-        }
-        const entryData = {
-          startTime,
-          endTime,
-          location,
-          type: entryType || "Dienst",
-          absenceMinutes,
-        };
-        const entries = schedule[member][day];
-        if (
-          entryEditState.member === member &&
-          entryEditState.day === day &&
-          entryEditState.index !== null
-        ) {
-          entries[entryEditState.index] = entryData;
-        } else {
-          entries.push(entryData);
-        }
-
-        if (isAbsenceEntry(entryData)) {
-          schedule[member][day] = [entryData];
-        } else {
-          schedule[member][day] = entries.filter(
-            (entry) => !isAbsenceEntry(entry),
-          );
-        }
-      }
-
-      function addAllDayEvent({ day, title, startTime, endTime }) {
-        if (!allDayEvents[day]) {
-          allDayEvents[day] = [];
-        }
-        const eventData = { title, startTime, endTime };
-        if (eventEditState.day === day && eventEditState.index !== null) {
-          allDayEvents[day][eventEditState.index] = eventData;
-        } else {
-          allDayEvents[day].push(eventData);
-        }
-      }
-
-      function resetEventEditState() {
-        eventEditState.day = null;
-        eventEditState.index = null;
-      }
-
-      function resetEntryEditState() {
-        entryEditState.member = null;
-        entryEditState.day = null;
-        entryEditState.index = null;
-      }
-
-      function updateDeleteButtonState() {
-        const hasEntrySelection =
-          entryEditState.member !== null &&
-          entryEditState.day !== null &&
-          entryEditState.index !== null;
-        const hasEventSelection =
-          eventEditState.day !== null && eventEditState.index !== null;
-        deleteBtn.disabled = !(hasEntrySelection || hasEventSelection);
-      }
-
-      function updateEntryTypeMode() {
-        const isEvent = allDayEventToggle.checked;
-        const isAbsence = absenceTypes.has(entryTypeSelect.value);
-        if (isEvent) {
-          entryTypeSelect.disabled = true;
-          locationInput.disabled = true;
-          startTimeInput.disabled = false;
-          endTimeInput.disabled = false;
-          absenceHoursInput.disabled = true;
-          absenceHoursInput.removeAttribute("required");
-          return;
-        }
-        entryTypeSelect.disabled = false;
-        locationInput.disabled = isAbsence;
-        startTimeInput.disabled = isAbsence;
-        endTimeInput.disabled = isAbsence;
-        absenceHoursInput.disabled = !isAbsence;
-        if (isAbsence) {
-          absenceHoursInput.setAttribute("required", "required");
-        } else {
-          absenceHoursInput.removeAttribute("required");
-        }
-      }
-
-      function toggleEventMode(isEvent) {
-        memberInput.disabled = isEvent;
-        eventTitleInput.disabled = !isEvent;
-        if (isEvent) {
-          eventTitleInput.setAttribute("required", "required");
-          memberInput.removeAttribute("required");
-          startTimeInput.removeAttribute("required");
-          endTimeInput.removeAttribute("required");
-        } else {
-          eventTitleInput.removeAttribute("required");
-          memberInput.setAttribute("required", "required");
-        }
-        updateEntryTypeMode();
-        updateDeleteButtonState();
-      }
-
-      scheduleForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const member = memberInput.value.trim();
-        const day = weekdaySelect.value;
-        const startTime = startTimeInput.value;
-        const endTime = endTimeInput.value;
-        const location = locationInput.value.trim();
-        const entryType = entryTypeSelect.value;
-        const absenceMinutes = parseHoursToMinutes(absenceHoursInput.value);
-        const eventTitle = eventTitleInput.value.trim();
-        const isAllDayEvent = allDayEventToggle.checked;
-
-        if (!day) {
-          return;
-        }
-
-        if (isAllDayEvent) {
-          if (!eventTitle) {
-            return;
-          }
-          const hasStart = Boolean(startTime);
-          const hasEnd = Boolean(endTime);
-          if (hasStart !== hasEnd) {
-            return;
-          }
-          addAllDayEvent({
-            day,
-            title: eventTitle,
-            startTime: startTime || "",
-            endTime: endTime || "",
-          });
-        } else {
-          if (!member) {
-            return;
-          }
-          if (absenceTypes.has(entryType)) {
-            const resolvedAbsenceMinutes =
-              absenceMinutes || DEFAULT_FULL_DAY_MINUTES;
-            addEntry({
-              member,
-              day,
-              startTime: "",
-              endTime: "",
-              location: "",
-              entryType,
-              absenceMinutes: resolvedAbsenceMinutes,
-            });
-          } else {
-            const hasStart = Boolean(startTime);
-            const hasEnd = Boolean(endTime);
-            if (hasStart !== hasEnd) {
-              return;
-            }
-            addEntry({
-              member,
-              day,
-              startTime,
-              endTime,
-              location,
-              entryType,
-            });
-          }
-        }
-        resetEntryFormFields();
-        resetEventEditState();
-        resetEntryEditState();
-        updateDeleteButtonState();
-        renderTable();
-      });
-
-      clearBtn.addEventListener("click", () => {
-        Object.keys(schedule).forEach((member) => {
-          delete schedule[member];
-        });
-        weekDays.forEach((day) => {
-          allDayEvents[day] = [];
-        });
-        resetEntryFormFields();
-        resetEntryEditState();
-        resetEventEditState();
-        updateDeleteButtonState();
-        renderTable();
-      });
-
-      deleteBtn.addEventListener("click", () => {
-        const isEvent = allDayEventToggle.checked;
-        let didDelete = false;
-        if (
-          isEvent &&
-          eventEditState.day !== null &&
-          eventEditState.index !== null
-        ) {
-          const events = allDayEvents[eventEditState.day];
-          if (events && events[eventEditState.index]) {
-            events.splice(eventEditState.index, 1);
-            didDelete = true;
-          }
-          resetEventEditState();
-        } else if (
-          entryEditState.member !== null &&
-          entryEditState.day !== null &&
-          entryEditState.index !== null
-        ) {
-          const entries =
-            schedule[entryEditState.member] &&
-            schedule[entryEditState.member][entryEditState.day];
-          if (entries && entries[entryEditState.index]) {
-            entries.splice(entryEditState.index, 1);
-            if (entries.length === 0) {
-              delete schedule[entryEditState.member][entryEditState.day];
-            }
-            didDelete = true;
-          }
-          resetEntryEditState();
-        }
-
-        if (didDelete) {
-          resetEntryFormFields();
-          renderTable();
-        }
-        updateDeleteButtonState();
-      });
-
-      pdfBtn.addEventListener("click", () => {
-        syncLegendPrintState();
-        const originalTitle = document.title;
-        document.title = getExportBaseName();
-        const restorePdfExport = preparePdfExport();
-        let didCleanup = false;
-        const cleanupAfterPrint = () => {
-          if (didCleanup) {
-            return;
-          }
-          didCleanup = true;
-          document.title = originalTitle;
-          restorePdfExport();
-        };
-
-        window.addEventListener("afterprint", cleanupAfterPrint, {
-          once: true,
-        });
-
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            try {
-              window.print();
-            } finally {
-              setTimeout(cleanupAfterPrint, 1000);
-            }
-          });
-        });
-      });
-
-      csvExportBtn.addEventListener("click", () => {
-        const delimiter = ";";
-        const header = [
-          "Typ",
-          "Mitarbeitende",
-          "Tag",
-          "Startzeit",
-          "Endzeit",
-          "Rolle/Notizen",
-          "Ereignis",
-          "Stunden (dezimal)",
-        ];
-        const rows = [header];
-
-        if (weekInput.value) {
-          rows.push(["Meta", "", "", "", "", "Week", weekInput.value, ""]);
-        }
-
-        const legendHtml = legendContent.innerHTML.trim();
-        const legendExport = legendHtml.replace(/\r?\n/g, "");
-        if (legendExport) {
-          rows.push(["Meta", "", "", "", "", "Legend", legendExport, ""]);
-        }
-
-        weekDays.forEach((day) => {
-          const events = allDayEvents[day];
-          if (!events || events.length === 0) {
-            return;
-          }
-          events.forEach((eventData) => {
-            rows.push([
-              "Ereignis",
-              "",
-              day,
-              eventData.startTime || "",
-              eventData.endTime || "",
-              "",
-              eventData.title,
-              "",
-            ]);
-          });
-        });
-
-        Object.keys(schedule).forEach((member) => {
-          weekDays.forEach((day) => {
-            const entry = schedule[member][day];
-            if (!entry || entry.length === 0) {
-              return;
-            }
-            const {
-              netMinutes,
-              hasBreak,
-              breakDeductionEntries,
-            } =
-              calculateDayTotals(entry);
-            entry.forEach((segment) => {
-              if (isAbsenceEntry(segment)) {
-                const absenceMinutes =
-                  segment.absenceMinutes || DEFAULT_FULL_DAY_MINUTES;
-                rows.push([
-                  segment.type,
-                  member,
-                  day,
-                  "",
-                  "",
-                  "",
-                  "",
-                  formatHoursDecimal(absenceMinutes),
-                ]);
-                return;
-              }
-              const hasTimes = segment.startTime && segment.endTime;
-              const minutes = calculateDurationMinutes(
-                segment.startTime,
-                segment.endTime,
-              );
-              let exportMinutes = entry.length === 1 ? netMinutes : minutes;
-              if (
-                hasBreak &&
-                breakDeductionEntries.has(segment) &&
-                entry.length > 1
-              ) {
-                exportMinutes = Math.max(0, minutes - 30);
-              }
-              rows.push([
-                segment.type || "Dienst",
-                member,
-                day,
-                segment.startTime,
-                segment.endTime,
-                segment.location || "",
-                "",
-                hasTimes ? formatHoursDecimal(exportMinutes) : "",
-              ]);
-            });
-          });
-        });
-
-        const csvContent = rows
-          .map((row) =>
-            row
-              .map((value) => escapeCsvValue(value, delimiter))
-              .join(delimiter),
-          )
-          .join("\n");
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = getExportFilename(".csv");
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        URL.revokeObjectURL(url);
-      });
-
-      csvImportBtn.addEventListener("click", () => {
-        csvFileInput.value = "";
-        csvFileInput.click();
-      });
-
-      csvFileInput.addEventListener("change", (event) => {
-        const file = event.target.files && event.target.files[0];
-        if (!file) {
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = () => {
-          const text = String(reader.result || "");
-          const parsed = parseCsvText(text);
-          if (!parsed.rows || parsed.rows.length <= 1) {
-            return;
-          }
-
-          Object.keys(schedule).forEach((member) => {
-            delete schedule[member];
-          });
-          weekDays.forEach((day) => {
-            allDayEvents[day] = [];
-          });
-
-          const [, ...dataRows] = parsed.rows;
-          const header = parsed.rows[0].map((cell) =>
-            cell.toLowerCase().trim(),
-          );
-          const typeIndex = header.indexOf("typ");
-          const memberIndex = header.indexOf("mitarbeitende");
-          const dayIndex = header.indexOf("tag");
-          const startIndex = header.indexOf("startzeit");
-          const endIndex = header.indexOf("endzeit");
-          const locationIndex = header.indexOf("rolle/notizen");
-          const eventIndex = header.indexOf("ereignis");
-          const hoursIndex = header.indexOf("stunden (dezimal)");
-
-          dataRows.forEach((row) => {
-            if (typeIndex !== -1) {
-              const rowType = (row[typeIndex] || "").toLowerCase();
-              if (rowType === "meta") {
-                const metaKey =
-                  (locationIndex !== -1 && row[locationIndex]) ||
-                  (eventIndex !== -1 && row[eventIndex]) ||
-                  "";
-                const metaValue =
-                  (eventIndex !== -1 && row[eventIndex]) ||
-                  (locationIndex !== -1 && row[locationIndex]) ||
-                  "";
-                if (!metaKey) {
-                  return;
-                }
-                const normalizedKey = metaKey.toLowerCase().trim();
-                if (normalizedKey === "week") {
-                  weekInput.value = metaValue;
-                  updateWeekdayHeaders(metaValue);
-                }
-                if (normalizedKey === "legend") {
-                  legendContent.innerHTML = metaValue;
-                }
-                return;
-              }
-              const day = row[dayIndex] || "";
-              if (!day) {
-                return;
-              }
-              if (rowType === "ereignis") {
-                const eventText =
-                  (eventIndex !== -1 && row[eventIndex]) ||
-                  (locationIndex !== -1 && row[locationIndex]) ||
-                  "";
-                const startTime = (startIndex !== -1 && row[startIndex]) || "";
-                const endTime = (endIndex !== -1 && row[endIndex]) || "";
-                if (!eventText) {
-                  return;
-                }
-                addAllDayEvent({
-                  day,
-                  title: eventText,
-                  startTime,
-                  endTime,
-                });
-                return;
-              }
-              if (
-                rowType === "urlaub" ||
-                rowType === "krank" ||
-                rowType === "feiertag"
-              ) {
-                const member = row[memberIndex] || "";
-                const hoursValue = hoursIndex !== -1 ? row[hoursIndex] : "";
-                const absenceMinutes =
-                  parseHoursToMinutes(hoursValue) || DEFAULT_FULL_DAY_MINUTES;
-                if (!member) {
-                  return;
-                }
-                addEntry({
-                  member,
-                  day,
-                  startTime: "",
-                  endTime: "",
-                  location: "",
-                  entryType:
-                    rowType === "urlaub"
-                      ? "Urlaub"
-                      : rowType === "krank"
-                        ? "Krank"
-                        : "Feiertag",
-                  absenceMinutes,
-                });
-                return;
-              }
-              const member = row[memberIndex] || "";
-              const startTime = row[startIndex] || "";
-              const endTime = row[endIndex] || "";
-              const location =
-                (locationIndex !== -1 && row[locationIndex]) || "";
-              if (!member) {
-                return;
-              }
-              if ((startTime && !endTime) || (!startTime && endTime)) {
-                return;
-              }
-              addEntry({
-                member,
-                day,
-                startTime,
-                endTime,
-                location,
-                entryType: "Dienst",
-              });
-              return;
-            }
-
-            const [member, day, startTime, endTime, location] = row;
-            if (!member || !day) {
-              return;
-            }
-            if ((startTime && !endTime) || (!startTime && endTime)) {
-              return;
-            }
-            addEntry({
-              member,
-              day,
-              startTime,
-              endTime,
-              location: location || "",
-              entryType: "Dienst",
-            });
-          });
-
-          renderTable();
-          syncLegendPrintState();
-        };
-        reader.readAsText(file, "utf-8");
-      });
-
-      scheduleBody.addEventListener("click", (event) => {
-        const cell = event.target.closest("td[data-day]");
-        if (!cell) {
-          return;
-        }
-
-        const row = cell.parentElement;
-        if (row.getAttribute("data-row-type") === "events") {
-          const day = cell.getAttribute("data-day");
-          const eventItem = event.target.closest("[data-event-index]");
-          if (!day) {
-            return;
-          }
-          allDayEventToggle.checked = true;
-          toggleEventMode(true);
-          resetEntryEditState();
-          if (eventItem) {
-            const index = Number(eventItem.getAttribute("data-event-index"));
-            const eventData = allDayEvents[day] && allDayEvents[day][index];
-            if (eventData) {
-              eventTitleInput.value = eventData.title;
-              startTimeInput.value = eventData.startTime || "";
-              endTimeInput.value = eventData.endTime || "";
-              eventEditState.day = day;
-              eventEditState.index = Number.isNaN(index) ? null : index;
-            }
-          } else {
-            eventTitleInput.value = "";
-            startTimeInput.value = "";
-            endTimeInput.value = "";
-            resetEventEditState();
-          }
-          weekdaySelect.value = day;
-          eventTitleInput.focus();
-          updateDeleteButtonState();
-          return;
-        }
-
-        const member = row.getAttribute("data-member");
-        const day = cell.getAttribute("data-day");
-        const entryIndexElement = event.target.closest("[data-entry-index]");
-        const entries = schedule[member] && schedule[member][day];
-        allDayEventToggle.checked = false;
-        toggleEventMode(false);
-        resetEventEditState();
-        resetEntryEditState();
-        memberInput.value = member;
-        weekdaySelect.value = day;
-        if (entries && entryIndexElement) {
-          const index = Number(
-            entryIndexElement.getAttribute("data-entry-index"),
-          );
-          const entry = entries[index];
-          if (entry) {
-            entryTypeSelect.value = entry.type || "Dienst";
-            startTimeInput.value = entry.startTime || "";
-            endTimeInput.value = entry.endTime || "";
-            locationInput.value = entry.location || "";
-            absenceHoursInput.value = formatHoursDecimalInput(
-              entry.absenceMinutes || DEFAULT_FULL_DAY_MINUTES,
-            );
-            entryEditState.member = member;
-            entryEditState.day = day;
-            entryEditState.index = Number.isNaN(index) ? null : index;
-            updateEntryTypeMode();
-          }
-        } else {
-          startTimeInput.value = "";
-          endTimeInput.value = "";
-          locationInput.value = "";
-          entryTypeSelect.value = "Dienst";
-          absenceHoursInput.value = "7,8";
-          resetEntryEditState();
-          updateEntryTypeMode();
-        }
-        updateDeleteButtonState();
-        if (absenceTypes.has(entryTypeSelect.value)) {
-          entryTypeSelect.focus();
-        } else {
-          startTimeInput.focus();
-        }
-      });
-
-      weekInput.addEventListener("change", () => {
-        updateWeekdayHeaders(weekInput.value);
-      });
-
-      allDayEventToggle.addEventListener("change", () => {
-        toggleEventMode(allDayEventToggle.checked);
-        if (allDayEventToggle.checked) {
-          resetEntryEditState();
-        }
-        if (!allDayEventToggle.checked) {
-          resetEventEditState();
-          eventTitleInput.value = "";
-          startTimeInput.value = "";
-          endTimeInput.value = "";
-        }
-        updateDeleteButtonState();
-      });
-
-      entryTypeSelect.addEventListener("change", () => {
-        updateEntryTypeMode();
-        if (absenceTypes.has(entryTypeSelect.value)) {
-          startTimeInput.value = "";
-          endTimeInput.value = "";
-          locationInput.value = "";
-          if (!absenceHoursInput.value) {
-            absenceHoursInput.value = "7,8";
-          }
-        }
-      });
-
-      legendContent.addEventListener("input", () => {
-        syncLegendPrintState();
-      });
-
-      updateWeekdayHeaders(weekInput.value);
-      toggleEventMode(false);
-      syncLegendPrintState();
-      renderTable();
-    </script>
   </body>
 </html>
