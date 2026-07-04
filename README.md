@@ -18,9 +18,10 @@ Die Daten verbleiben lokal im Browser und werden nicht an einen Server gesendet.
 - **Flash-Feedback**: eingetragene Zellen blinken grün nach dem Hinzufügen
 - **Tastatur-Shortcuts**: Esc = Formular zurücksetzen, Ctrl/Cmd+Backspace = Woche leeren
 - **Zeit-Validierung**: roter Rahmen bei Endzeit < Startzeit
-- **CSV-Import/Export**: mit automatischer Dateinamen-Übernahme
-- **Speichern**: CSV-Download mit dem aktuellen Dateinamen
+- **CSV-Import/Export**: mit automatischer Dateinamen-Übernahme; ausgewählte Formular-Edits werden vor Export/Speichern übernommen
+- **Speichern**: schreibt in unterstützten Browsern zurück in die importierte CSV-Datei; sonst Save-As/Download mit aktuellem Dateinamen
 - **PDF-Export**: A4 Landscape mit Skalierung
+- **Kompakte Toolbar**: feste Icon-Leiste für Leeren, PDF, CSV, Import, Speichern und Dateiname
 - **Druckoptimierte Darstellung**: Formular und Toolbar werden im Druck ausgeblendet
 - **Legende/Zusatzinfos**: bearbeitbarer Bereich unter der Tabelle
 
@@ -66,7 +67,7 @@ Die App verwendet ein IIFE-Modul-Pattern mit gemeinsamem Namespace
 | Modul       | Datei             | Verantwortung                                      |
 |-------------|-------------------|---------------------------------------------------|
 | `D.Time`       | `js/time.js`        | `parseTimeToMinutes`, `calculateDurationMinutes`, `formatHours`, `formatHoursDecimal`, `formatHoursDecimalInput`, `formatTimeFromMinutes` |
-| `D.BreakRules` | `js/break-rules.js`| `applyBreakRule`, `calculateDayTotals`, `isAbsenceEntry`, `isTimedEntry`, `absenceTypes`, `DEFAULT_FULL_DAY_MINUTES` |
+| `D.BreakRules` | `js/break-rules.js`| `DEFAULT_FULL_DAY_MINUTES`, `absenceTypes`, `getEntryWindowMinutes`, `applyBreakRule`, `calculateDayTotals`, `isAbsenceEntry`, `isTimedEntry` |
 | `D.Csv`        | `js/csv.js`         | `generateCsvContent`, `parseCsvText`, `parseCsvLine`, `escapeCsvValue`, `escapeHtml`, `formatEventTitle` |
 | `D.Week`       | `js/week.js`        | `parseWeekValue`, `getIsoWeekStartDate`, `formatDate`, `updateWeekdayHeaders`, `getIsoWeeksInYear`, `shiftWeek`, `weekDays` |
 | `D.Export`     | `js/export.js`      | `getExportFilename`, `getExportBaseName`, `getPixelsPerMillimeter`, `preparePdfExport`, `syncLegendPrintState` |
@@ -74,21 +75,22 @@ Die App verwendet ein IIFE-Modul-Pattern mit gemeinsamem Namespace
 | `D.Form`       | `js/form.js`        | `resetFormExceptMember`, `updateMemberDatalist`, `updateDeleteButtonState`, `updateEntryTypeMode`, `updateSubmitButtonText`, `toggleEventMode`, `validateTimeRange` |
 | `D.Render`     | `js/render.js`      | `renderTable` (mit `renderEventsRow`, `renderMemberRow`, `renderEntryCell`), `flashSubmittedCells` |
 | `D.Import`     | `js/import.js`      | `processImportedFile` |
-| `D.App`        | `js/app.js`         | DOM-Referenzen, alle Event-Listener, Tastatur-Shortcuts, Initialisierung |
+| Einstiegspunkt | `js/app.js`         | DOM-Referenzen, alle Event-Listener, Tastatur-Shortcuts, Initialisierung |
 
 ### Abhängigkeiten
 
 ```
 app.js → alle Module
-render.js → Time, BreakRules, Csv, State
-import.js → Time, BreakRules, Csv, Week, State, Form, Render, Export
+render.js → Time, BreakRules, Csv, Week
+import.js → BreakRules, Csv, Week, State, Render, Export
 form.js → BreakRules, State
 state.js → BreakRules
-csv.js → Time, BreakRules, State, Week, Export
+csv.js → Time, BreakRules, Week
 ```
 
-Module empfangen ihre Abhängigkeiten als Funktionsparameter — sie greifen nicht
-direkt auf globale Variablen zu. Nur `app.js` hält direkte DOM-Referenzen
+Module hängen ihre öffentlichen APIs an `window.Dienstplan` und greifen über den
+gemeinsamen Namespace (`D.Time`, `D.Csv` usw.) auf andere Module zu. Nur `app.js`
+hält direkte DOM-Referenzen
 (`getElementById` etc.).
 
 ## Verwendung
@@ -96,9 +98,14 @@ direkt auf globale Variablen zu. Nur `app.js` hält direkte DOM-Referenzen
 Die App ist eine einzelne HTML-Datei ohne Build-Step oder Server.
 Einfach `index.html` im Browser öffnen (Chrome, Edge, Firefox, Safari).
 
+Direktes Überschreiben einer importierten CSV-Datei nutzt die File System Access
+API. Das funktioniert vor allem in Chrome/Edge und in der Regel nur über einen
+sicheren Kontext wie `localhost` oder HTTPS. Ohne diese API speichert die App
+per Save-As-Dialog oder Download-Fallback.
+
 ## Technologie
 
 - **Bootstrap 5.3.2** (via CDN) für Layout und Formulare
 - **Space Grotesk** + **IBM Plex Mono** (via Google Fonts)
 - **Keine Build-Tools, keine Dependencies, kein Framework**
-- **Keine Persistenz** — alle Daten leben im Speicher und sind weg beim Schließen des Tabs
+- **Keine Server-Persistenz** — alle Daten leben im Speicher und müssen per CSV gespeichert werden
