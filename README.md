@@ -84,7 +84,7 @@ app.js → alle Module
 render.js → Time, BreakRules, Csv, Week
 import.js → BreakRules, Csv, Week, State, Render, Export
 form.js → BreakRules, State
-state.js → BreakRules
+state.js → BreakRules, Time
 csv.js → Time, BreakRules, Week
 ```
 

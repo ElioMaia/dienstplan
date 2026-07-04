@@ -35,6 +35,33 @@
     activeCell = null;
   }
 
+  function getEntrySortMinutes(entry) {
+    const startMinutes = D.Time.parseTimeToMinutes(entry.startTime);
+    if (startMinutes !== null) {
+      return startMinutes;
+    }
+    const endMinutes = D.Time.parseTimeToMinutes(entry.endTime);
+    if (endMinutes !== null) {
+      return endMinutes;
+    }
+    return Number.POSITIVE_INFINITY;
+  }
+
+  function getTimeSortMinutes(value) {
+    const minutes = D.Time.parseTimeToMinutes(value);
+    return minutes === null ? Number.POSITIVE_INFINITY : minutes;
+  }
+
+  function sortEntriesChronologically(entries) {
+    entries.sort((a, b) => {
+      const startDiff = getEntrySortMinutes(a) - getEntrySortMinutes(b);
+      if (startDiff !== 0) {
+        return startDiff;
+      }
+      return getTimeSortMinutes(a.endTime) - getTimeSortMinutes(b.endTime);
+    });
+  }
+
   function addEntry({
     member,
     day,
@@ -75,6 +102,7 @@
       schedule[member][day] = entries.filter(
         (entry) => !D.BreakRules.isAbsenceEntry(entry),
       );
+      sortEntriesChronologically(schedule[member][day]);
     }
   }
 
